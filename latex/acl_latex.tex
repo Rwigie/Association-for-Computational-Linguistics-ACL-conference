@@ -771,7 +771,7 @@ GRPO and GDPO show complementary empirical strengths. GRPO achieves the best OOD
 
 \subsection{Results on S$^2$-Bench MolOpt}
 
-We further evaluate \textsc{C-Moral} on S$^2$-Bench MolOpt, which considers both property improvement and structural similarity. As shown in Table~\ref{tab:molopt_results}, \textsc{C-Moral} achieves the strongest overall performance across LogP, MR, and QED, consistently improving WSR over the corresponding GeLLM$^4$O-C backbones. For example, on LogP, WSR improves from $0.6554/0.6637$ to $0.6756/0.6951$ on the Mistral and LLaMA backbones, respectively. On MR, \textsc{C-Moral}$_{\text{Mistral}}$ achieves the best WSR of $0.8126$, with high SR ($0.9546$) and similarity ($0.8513$). These results show that \textsc{C-Moral} generalizes beyond C-MuMOInstruct to standard goal-oriented molecular optimization.
+We further evaluate \textsc{C-Moral} on S$^2$-Bench MolOpt, which considers both property improvement and structural similarity. As shown in Table~\ref{tab:molopt_results}, \textsc{C-Moral} achieves the strongest overall performance across LogP, MR, and QED, consistently improving WSR over the corresponding GeLLM$^4$O-C backbones. For example, on LogP, WSR improves from $0.6771/0.6637$ to $0.7735/0.6949$ on the Mistral and LLaMA backbones, respectively. On MR, \textsc{C-Moral}$_{\text{Mistral}}$ achieves the best WSR of $0.8127$, with high SR ($0.9546$) and similarity ($0.8513$). These results show that \textsc{C-Moral} generalizes beyond C-MuMOInstruct to standard goal-oriented molecular optimization.
 
 
 
@@ -1056,28 +1056,28 @@ Galactica-125M (OpenMolIns-xlarge)
 & 0.5786 & 0.5677 & 0.3285 & 0.8626 \\
 \midrule
 GeLLM$^4$O-C$_{\mathrm{Mistral}}$
-& 0.9010 & 0.7515 & 0.6554 & \textbf{0.9998}
+& 0.9010 & 0.7515 & 0.6771 & \textbf{0.9998}
 & \underline{0.9420} & 0.7481 & 0.7047 & \underline{0.9996}
-& 0.8760 & \underline{0.7482} & \underline{0.6770} & 0.9998 \\
+& 0.8760 & \underline{0.7482} & \underline{0.6554} & 0.9998 \\
 
 GeLLM$^4$O-C$_{\mathrm{LLaMA}}$
 & 0.8936 & 0.7427 & 0.6637 & \underline{0.9996}
 & 0.9152 & 0.7539 & 0.6900 & 0.9994
-& 0.8832 & 0.7189 & 0.6350 & 0.9994 \\
+& 0.8832 & 0.7189 & 0.6349 & 0.9994 \\
 \midrule
 \textsc{C-Moral}$_{\mathrm{Mistral}}$
-& \textbf{0.9650} & \textbf{0.8016} & \underline{0.6756} & 0.9996
-& \textbf{0.9546} & \textbf{0.8513} & \textbf{0.8126} & \textbf{0.9998}
-& \underline{0.9010} & \textbf{0.7498} & \textbf{0.7735} & \textbf{1.0000} \\
+& \textbf{0.9650} & \textbf{0.8016} & \textbf{0.7735} & 0.9996
+& \textbf{0.9546} & \textbf{0.8513} & \textbf{0.8127} & \textbf{0.9998}
+& \underline{0.9010} & \textbf{0.7498} & \textbf{0.6756} & \textbf{1.0000} \\
 
 \textsc{C-Moral}$_{\mathrm{LLaMA}}$
-& \underline{0.9215} & \underline{0.7541} & \textbf{0.6951} & \textbf{0.9998}
+& \underline{0.9215} & \underline{0.7541} & \underline{0.6949} & \textbf{0.9998}
 & 0.9372 & \underline{0.7864} & \underline{0.7370} & 0.9995
-& \textbf{0.9106} & 0.7164 & 0.6523 & \underline{0.9999} \\
+& \textbf{0.9106} & 0.7164 & 0.6524 & \underline{0.9999} \\
 \bottomrule
 \end{tabular}
 }
-\caption{Performance comparison on the MolOpt task from S$^2$-Bench. Baseline results above are directly reported from the original benchmark paper, while GeLLM$^4$O-C and \textsc{C-Moral} are evaluated using the same MolOpt protocol. WSR is computed as SR $\times$ Sim. Best results are bolded and second-best results are underlined.}
+\caption{Performance comparison on the MolOpt task from S$^2$-Bench. Baseline results above are directly reported from the original benchmark paper, while GeLLM$^4$O-C and \textsc{C-Moral} are evaluated using the same MolOpt protocol. WSR is computed as SR $\times$ Sim from the displayed four-decimal values. Best results are bolded and second-best results are underlined.}
 \label{tab:molopt_results}
 \end{table*}
 
