@@ -592,81 +592,64 @@ These results suggest that the value-network-based PPO objective is less effecti
 % \end{table*}
 \begin{table*}[t]
 \centering
-\begin{minipage}[t]{0.64\textwidth}
-\vspace{0pt}
-\centering
-(a)\par\vspace{2pt}
-\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{
-\begin{tabular}{@{} l cccc cccc @{}}
+\vspace{-2pt}
+\textbf{(a)}\par\vspace{3pt}
+{\fontsize{8.5}{9.2}\selectfont
+\setlength{\tabcolsep}{2.2pt}
+\renewcommand{\arraystretch}{1.13}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l*{7}{c}@{\hspace{7pt}}*{7}{c}@{}}
 \toprule
-\multirow{2}{*}{\textbf{Model}} & \multicolumn{4}{c}{In-Domain (IND)} & \multicolumn{4}{c}{Out-of-Domain (OOD)} \\
-\cmidrule(lr){2-5} \cmidrule(lr){6-9}
-& \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ \\
+\multirow{2}{*}{\textbf{Model}} & \multicolumn{7}{c}{\textbf{In-Domain (IND)}} & \multicolumn{7}{c}{\textbf{Out-of-Domain (OOD)}} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-15}
+& \textbf{SOR}$\uparrow$ & \textbf{SSOR}$\uparrow$ & \textbf{Sim}$\uparrow$ & \textbf{RI}$\uparrow$ & \textbf{Val}$\uparrow$ & \textbf{SAS}$\downarrow$ & \textbf{Nov}$\uparrow$
+& \textbf{SOR}$\uparrow$ & \textbf{SSOR}$\uparrow$ & \textbf{Sim}$\uparrow$ & \textbf{RI}$\uparrow$ & \textbf{Val}$\uparrow$ & \textbf{SAS}$\downarrow$ & \textbf{Nov}$\uparrow$ \\
 \midrule
-
-\rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
-Llama (0-shot) & 3.0 & 0.8 & \textbf{0.66} & 8.0 & 2.0 & 0.5 & \textbf{0.67} & 6.3 \\
-Mistral (0-shot) & 2.6 & 0.5 & \textbf{0.66} & 7.0 & 1.1 & 0.3 & \textbf{0.67} & 6.4 \\
-Llama (1-shot) & 4.7 & 1.5 & \underline{0.63} & 9.5 & 3.6 & 1.1 & 0.60 & 6.9 \\
-Mistral (1-shot) & 5.8 & 2.3 & 0.61 & 9.3 & 4.3 & 1.4 & 0.62 & 9.2 \\
-GPT-5o (1-shot) & 6.1 & 1.9 & 0.62 & 9.8 & 5.6 & 2.3 & 0.61 & 7.8 \\
-GPT-5o (2-shot) & 7.8 & 2.9 & 0.62 & 13.5 & 7.7 & 2.8 & 0.60 & 10.3 \\
-\midrule
-
-\rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{Expert Models \& SFT Baselines}} \\
-REINVENT-4 & 3.5 & 1.3 & 0.59 & 9.2 & 2.3 & 0.5 & 0.61 & 4.5 \\
-MAMO (direct) & 5.2 & 2.1 & 0.53 & 8.6 & 5.1 & 2.5 & 0.49 & 11.3 \\
-MAMO (adapted) & 12.4 & 5.1 & 0.50 & 9.4 & 10.7 & 6.0 & 0.49 & 8.3 \\
-MolT5-Large & 0.9 & 0.3 & 0.62 & 10.9 & 0.5 & 0.1 & \underline{0.63} & 3.9 \\
-MolT5-Large (SFT) & 13.9 & 4.6 & 0.62 & 20.3 & 10.6 & 3.6 & 0.62 & 5.8 \\
-GeLLM$^4$O-C$_{\mathrm{Llama}}$    & 30.2 & 13.7 & 0.56 & 61.3 & 25.2 & 10.2 & 0.57 & 6.5 \\
-GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 24.4 & 9.8 & 0.60 & \textbf{27.3} \\
-\midrule
-
-\rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{RL Post-Training (Ours: \textsc{C-Moral})}} \\
-\multicolumn{9}{@{}l@{}}{\textbf{GRPO Method}} \\
-\hspace{5pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 7.9 & 0.61 & 25.4 & 19.2 & 7.7 & 0.61 & 4.6 \\
-\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 40.2 & 20.0 & 0.58 & 102.6 & 37.2 & 19.6 & 0.60 & 10.5 \\
-\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \textbf{48.9} & \underline{25.1} & 0.59 & 96.1 & \textbf{39.5} & \textbf{20.8} & 0.60 & 19.5 \\
-\addlinespace[2pt]
-\multicolumn{9}{@{}l@{}}{\textbf{GDPO Method}} \\
-\hspace{5pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 8.8 & 0.60 & 49.1 & 16.8 & 6.4 & 0.60 & 5.2  \\
-\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 43.4 & \textbf{25.4} & 0.57 & \underline{110.3} & 35.6 & 19.5 & 0.59 & 19.1 \\
-\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \underline{47.0} & 24.9 & 0.59 & \textbf{110.4} & \underline{38.3} & \underline{19.8} & 0.59 & \underline{27.2} \\
+\rowcolor{gray!10} \multicolumn{15}{@{}l@{}}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+Llama (0-shot) & 3.0 & 0.8 & \textbf{0.66} & 8.0 & 96.6 & 2.88 & 99.9 & 2.0 & 0.5 & \textbf{0.67} & 6.3 & 97.1 & 3.03 & 99.1 \\
+Mistral (0-shot) & 2.6 & 0.5 & \textbf{0.66} & 7.0 & 86.4 & 2.83 & 99.8 & 1.1 & 0.3 & \textbf{0.67} & 6.4 & 86.7 & 2.92 & 99.9 \\
+Llama (1-shot) & 4.7 & 1.5 & \underline{0.63} & 9.5 & 99.0 & 2.80 & 97.0 & 3.6 & 1.1 & 0.60 & 6.9 & 99.5 & 2.94 & 89.6 \\
+Mistral (1-shot) & 5.8 & 2.3 & 0.61 & 9.3 & 98.8 & 2.69 & 95.2 & 4.3 & 1.4 & 0.62 & 9.2 & 99.6 & 2.83 & 90.3 \\
+GPT-5o (1-shot) & 6.1 & 1.9 & 0.62 & 9.8 & 91.5 & 2.72 & 98.7 & 5.6 & 2.3 & 0.61 & 7.8 & 92.9 & 2.83 & 98.8 \\
+GPT-5o (2-shot) & 7.8 & 2.9 & 0.62 & 13.5 & 92.9 & 2.73 & 85.5 & 7.7 & 2.8 & 0.60 & 10.3 & 97.1 & 2.79 & 82.5 \\
+\rowcolor{gray!10} \multicolumn{15}{@{}l@{}}{\textit{Expert Models \& SFT Baselines}} \\
+REINVENT-4 & 3.5 & 1.3 & 0.59 & 9.2 & 100.0 & 2.49 & 99.8 & 2.3 & 0.5 & 0.61 & 4.5 & 99.9 & 2.98 & 99.8 \\
+MAMO (direct) & 5.2 & 2.1 & 0.53 & 8.6 & -- & -- & -- & 5.1 & 2.5 & 0.49 & 11.3 & -- & -- & -- \\
+MAMO (adapted) & 12.4 & 5.1 & 0.50 & 9.4 & -- & -- & -- & 10.7 & 6.0 & 0.49 & 8.3 & -- & -- & -- \\
+MolT5-Large & 0.9 & 0.3 & 0.62 & 10.9 & 99.4 & 2.61 & 99.8 & 0.5 & 0.1 & \underline{0.63} & 3.9 & 99.9 & 2.87 & 99.4 \\
+MolT5-Large (SFT) & 13.9 & 4.6 & 0.62 & 20.3 & 98.7 & 2.50 & 98.3 & 10.6 & 3.6 & 0.62 & 5.8 & 97.6 & 2.66 & 99.6 \\
+GeLLM$^4$O-C$_{\mathrm{Llama}}$ & 30.2 & 13.7 & 0.56 & 61.3 & 90.2 & 2.53 & 98.0 & 25.2 & 10.2 & 0.57 & 6.5 & 98.9 & 2.58 & 99.4 \\
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98.6 & 24.4 & 9.8 & 0.60 & \textbf{27.3} & 99.9 & 2.64 & 99.1 \\
+\rowcolor{gray!10} \multicolumn{15}{@{}l@{}}{\textit{RL Post-Training (Ours: \textsc{C-Moral})}} \\
+\multicolumn{15}{@{}l@{}}{\textbf{GRPO Method}} \\
+\hspace{3pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 7.9 & 0.61 & 25.4 & 98.8 & 2.37 & 97.6 & 19.2 & 7.7 & 0.61 & 4.6 & 98.2 & 2.61 & 99.5 \\
+\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 40.2 & 20.0 & 0.58 & 102.6 & 99.8 & 2.43 & 97.4 & 37.2 & 19.6 & 0.60 & 10.5 & 99.9 & 2.73 & 99.6 \\
+\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \textbf{48.9} & \underline{25.1} & 0.59 & 96.1 & 99.9 & 2.46 & 98.2 & \textbf{39.5} & \textbf{20.8} & 0.60 & 19.5 & 100.0 & 2.84 & 99.4 \\
+\multicolumn{15}{@{}l@{}}{\textbf{GDPO Method}} \\
+\hspace{3pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 8.8 & 0.60 & 49.1 & 98.5 & 2.39 & 99.1 & 16.8 & 6.4 & 0.60 & 5.2 & 98.0 & 2.57 & 99.6 \\
+\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 43.4 & \textbf{25.4} & 0.57 & \underline{110.3} & 100.0 & 2.40 & 99.0 & 35.6 & 19.5 & 0.59 & 19.1 & 100.0 & 2.60 & 99.3 \\
+\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \underline{47.0} & 24.9 & 0.59 & \textbf{110.4} & 99.9 & 2.40 & 98.6 & \underline{38.3} & \underline{19.8} & 0.59 & \underline{27.2} & 100.0 & 2.68 & 99.8 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\end{minipage}
-\hfill
-% =========================================================
-% 右侧多图垂直堆叠排版区
-% =========================================================
-\begin{minipage}[t]{0.34\textwidth}
-\vspace{0pt}
-\centering
-% 上方图片：原有的柱状图 (b)
-(b)\par\vspace{2pt}
-\includegraphics[width=\textwidth,height=0.14\textheight,keepaspectratio]{figs/result_bar.pdf}
-
-\vspace{12pt} % 控制上下两张子图之间的垂直间距
-
-% (c) Compact, fully editable vector comparison based on Table 2(a).
-(c)\par\vspace{2pt}
-% Render the supplied two-panel SOR/RI PDF directly when present.
-% The previous vector figure remains a compilable fallback until the PDF is uploaded.
-\IfFileExists{figs/cmoral_table2c_sor_ri.pdf}{%
-  \includegraphics[width=\linewidth]{figs/cmoral_table2c_sor_ri.pdf}%
-}{%
-  \resizebox{\linewidth}{!}{\input{figs/cmoral_grpo_gdpo_focus.tex}}%
 }
+\vspace{9pt}
+\noindent\begin{minipage}[t]{0.492\textwidth}
+\centering\textbf{(b)}\par\vspace{2pt}
+\includegraphics[width=\linewidth]{figs/Table2b_average_SOR.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.492\textwidth}
+\centering\textbf{(c)}\par\vspace{2pt}
+\includegraphics[width=\linewidth]{figs/Table2c_GRPO_vs_GDPO.pdf}
 \end{minipage}
-\caption{Overall multi-objective optimization results on C-MuMOInstruct. 
-(a) Comprehensive comparison of IND and OOD performance. For RL post-training methods, main-table results report the mean over three random seeds with beam search = 20; standard deviations are reported in Table~\ref{tab:rl_algorithm_comparison}.
-(b) Relative improvement margins in SOR and SSOR over the respective SFT baselines. 
-(c) GRPO/GDPO comparison of SOR and RI across Mistral/LLaMA IND/OOD; crowns mark the higher value. MAMO-direct and MAMO-adapted are evaluated on both IND and OOD tasks.}
+\vspace{1pt}
+\caption{Overall multi-objective optimization results on C-MuMOInstruct.
+(a) IND and OOD mean metrics, including molecular validity (Val, \%),
+synthetic accessibility (SAS; lower is better), and novelty (Nov, \%).
+Val/SAS/Nov are unweighted averages across five tasks per split calculated from the per-task results in Tables~\ref{tab:ind_detailed_results} and~\ref{tab:ood_detailed_results}; ``--'' denotes unreported results.
+(b) Average SOR for SFT and the better of GRPO/GDPO on each backbone (GRPO for MolT5 and Mistral, GDPO for LLaMA).
+(c) GRPO/GDPO comparisons of SOR and relative improvement (RI).
+For RL post-training methods, the SOR/SSOR/Sim/RI values are mean results over three seeds with beam search = 20; see Table~\ref{tab:rl_algorithm_comparison} for standard deviations.}
 \label{fig:c-mumo_benchmark}
 \end{table*}
 
@@ -762,10 +745,10 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 24.4 & 9.8 & 0.6
 We evaluate \textsc{C-Moral} on C-MuMOInstruct across three backbones: \textsc{Mistral}, \textsc{Llama}, and \textsc{MolT5}. As shown in Table~\ref{fig:c-mumo_benchmark}(a), our framework consistently improves controllable multi-objective molecular optimization across different LLMs. Detailed per-task results are reported in Appendix~\ref{appendix:complete_exp_results}.
 
 \paragraph{State-of-the-Art IND Performance.}
-On IND tasks, \textsc{C-Moral} outperforms all compared methods in controllable molecular optimization. As shown in Table~\ref{fig:c-mumo_benchmark}(a), it obtains the best SOR of \textbf{$48.9\%$} with \textsc{C-Moral}$_{\mathrm{Mistral}}$ and the best SSOR of \textbf{$25.4\%$} with \textsc{C-Moral}$_{\mathrm{Llama}}$. These gains indicate that our RL framework better satisfies target property improvement and preservation constraints simultaneously. Meanwhile, \textsc{C-Moral} maintains competitive similarity around $0.59$--$0.61$ and strong molecular quality in validity, novelty, and synthetic accessibility, as detailed in Table~\ref{tab:ind_detailed_results}(b), supporting validity and synthetic accessibility, although these metrics cannot rule out optimization artifacts from computational property predictors. The radar visualization in Table~\ref{fig:c-mumo_benchmark}(c) further supports this balanced improvement.
+On IND tasks, \textsc{C-Moral} outperforms all compared methods in controllable molecular optimization. As shown in Table~\ref{fig:c-mumo_benchmark}(a), it obtains the best SOR of \textbf{$48.9\%$} with \textsc{C-Moral}$_{\mathrm{Mistral}}$ and the best SSOR of \textbf{$25.4\%$} with \textsc{C-Moral}$_{\mathrm{Llama}}$. These gains indicate that our RL framework better satisfies target property improvement and preservation constraints simultaneously. Meanwhile, \textsc{C-Moral} maintains competitive similarity around $0.59$--$0.61$ and strong molecular quality in validity, novelty, and synthetic accessibility, as detailed in Table~\ref{tab:ind_detailed_results}(b), supporting validity and synthetic accessibility, although these metrics cannot rule out optimization artifacts from computational property predictors. The GRPO/GDPO comparison in Table~\ref{fig:c-mumo_benchmark}(c) further supports this balanced improvement.
 
 \paragraph{Adaptation to Unseen Objective Combinations.}
-The OOD setting evaluates label-free adaptation to held-out objective combinations. As shown in Table~\ref{fig:c-mumo_benchmark}(b), GRPO achieves the strongest OOD gains on both LLM backbones. For \textsc{Mistral}, it improves SOR from $24.4\%$ to \textbf{$39.5\%$} ($+61.9\%$) and SSOR from $9.8\%$ to \textbf{$20.8\%$} ($+112.2\%$). For \textsc{Llama}, it improves SOR from $25.2\%$ to \textbf{$37.2\%$} ($+47.6\%$) and SSOR from $10.2\%$ to \textbf{$19.6\%$} ($+92.2\%$). GDPO also remains highly competitive, reaching $38.3\%/19.8\%$ SOR/SSOR on \textsc{Mistral} and $35.6\%/19.5\%$ on \textsc{Llama}. These consistent OOD improvements, together with the molecular quality metrics in Table~\ref{tab:ood_detailed_results}(b), suggest that \textsc{C-Moral} adapts to unseen property combinations while maintaining valid, novel, and synthetically reasonable molecules.
+The OOD setting evaluates label-free adaptation to held-out objective combinations. As shown in Table~\ref{fig:c-mumo_benchmark}(a,c), GRPO achieves the strongest OOD gains on both LLM backbones. For \textsc{Mistral}, it improves SOR from $24.4\%$ to \textbf{$39.5\%$} ($+61.9\%$) and SSOR from $9.8\%$ to \textbf{$20.8\%$} ($+112.2\%$). For \textsc{Llama}, it improves SOR from $25.2\%$ to \textbf{$37.2\%$} ($+47.6\%$) and SSOR from $10.2\%$ to \textbf{$19.6\%$} ($+92.2\%$). GDPO also remains highly competitive, reaching $38.3\%/19.8\%$ SOR/SSOR on \textsc{Mistral} and $35.6\%/19.5\%$ on \textsc{Llama}. These consistent OOD improvements, together with the molecular quality metrics in Table~\ref{tab:ood_detailed_results}(b), suggest that \textsc{C-Moral} adapts to unseen property combinations while maintaining valid, novel, and synthetically reasonable molecules.
 
 \paragraph{Multi-objective baseline and single-candidate inference.}
 MAMO-direct and MAMO-adapted achieve IND SOR of $5.2\%$/$12.4\%$ and OOD SOR of $5.1\%$/$10.7\%$, respectively, compared with $48.9\%$/$39.5\%$ for C-MORAL-GRPO (Mistral). MAMO-adapted uses matching property calculators but does not receive the explicit preservation intervals, so this is not an exactly matched instruction interface (Appendix~\ref{appendix:mamo}). Without oracle-based candidate reranking ($B=1$), Mistral-GRPO still reaches $42.7\%$ IND and $32.5\%$ OOD SOR, above its SFT baseline ($30.8\%$/$23.1\%$), supporting learned-policy gains (Table~\ref{tab:single_candidate}).
