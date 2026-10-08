@@ -2,11 +2,11 @@
 \label{appendix:sensitivity}
 
 \subsection{Reward-shaping sensitivity}
-The sigmoid alignment uses $\alpha_p=k/\Delta_p$, with $k=5$ by default. Table~\ref{tab:k_sensitivity} reproduces the Mistral GRPO sweep conducted in the author rebuttal. A very small scaling factor makes rewards less discriminative, whereas excessively large factors approach a hard threshold.
+The sigmoid alignment uses $\alpha_p=k/\Delta_p$, with $k=5$ by default. Table~\ref{tab:k_sensitivity} presents the sensitivity of Mistral-based GRPO to the sigmoid scaling factor. A very small scaling factor makes rewards less discriminative, whereas excessively large factors approach a hard threshold.
 
 \begin{table*}[t]
 \centering\small
-\caption{Sigmoid scaling sensitivity on Mistral GRPO, from the author rebuttal.}
+\caption{Effect of sigmoid scaling factor $k$ on C-MORAL-GRPO with Mistral-7B.}
 \label{tab:k_sensitivity}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccccc}\toprule
@@ -23,7 +23,7 @@ For GDPO, the temperature $\tau$ controls how strongly smooth-min aggregation pr
 
 \begin{table*}[t]
 \centering\small
-\caption{LogSumExp temperature sensitivity on Mistral GDPO, from the author rebuttal.}
+\caption{Effect of smooth-min temperature $\tau$ on C-MORAL-GDPO with Mistral-7B.}
 \label{tab:tau_sensitivity}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccccc}\toprule
@@ -38,11 +38,11 @@ $\tau$ & SOR & SSOR & Sim & RI & SOR & SSOR & Sim & RI\\\midrule
 
 \subsection{Single-candidate decoding and oracle budget}
 \label{appendix:oracle_budget}
-For one pass through 10,000 training prompts with four rollouts per prompt, the number of generated-molecule evaluations is approximately 40,000 per task. If $K$ properties are evaluated per molecule, this corresponds to $40{,}000K$ scalar property evaluations. This per-pass count is \emph{not} a verified aggregate training oracle budget: multiple optimization passes, source-property lookups, evaluation frequency, and caching may change the total. At test time, no policy updates are performed. With $B=20$, the selection protocol evaluates up to 20 candidates against the task-property oracles per source; with $B=1$, no oracle-based \emph{candidate reranking} is required, although source-instruction construction and benchmark scoring can still involve property oracle calls.
+For one pass through 10,000 training prompts with four rollouts per prompt, the number of generated-molecule evaluations is approximately 40,000 per task. If $K$ properties are evaluated per molecule, this corresponds to $40{,}000K$ scalar property evaluations. This count characterizes generated-molecule evaluations for one pass rather than the aggregate consumption over all training iterations; source-property calculations, repeated rollouts, and caching additionally affect the total. At test time, no policy updates are performed. With $B=20$, the selection protocol evaluates up to 20 candidates against the task-property oracles per source; with $B=1$, no oracle-based \emph{candidate reranking} is required, although source-instruction construction and benchmark scoring can still involve property oracle calls.
 
 \begin{table*}[t]
 \centering\small
-\caption{Mistral greedy decoding with $B=1$, without multi-candidate reranking. Values from the rebuttal.}
+\caption{Greedy single-candidate generation ($B=1$) on Mistral-7B, without test-time multi-candidate reranking.}
 \label{tab:single_candidate}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccccc}\toprule
@@ -56,12 +56,12 @@ GeLLM$^4$O-C & 30.8 & 12.7 & 0.61 & 44.0 & 23.1 & 7.9 & 0.60 & 16.5\\
 
 \subsection{Multi-objective baseline and comparison scope}
 \label{appendix:mamo}
-MAMO-direct follows the released multi-agent workflow without task-specific prompt changes. MAMO-adapted replaces feedback tools with the relevant RDKit/ADMET-AI calculators and changes expert prompts to target the requested property directions. Unlike \textsc{C-Moral}, the MAMO agents do not receive the exact improvement margins, thresholds, or source-dependent preservation intervals. Both MAMO variants return 20 final candidates per input, evaluated under the C-MuMOInstruct IND metrics and selection protocol. Their iterative internal oracle cost may be higher, so equal numbers of final candidates should not be confused with equal total oracle consumption. No OOD MAMO results were reported.
+MAMO-direct follows the released multi-agent workflow without task-specific prompt changes. MAMO-adapted replaces feedback tools with the relevant RDKit/ADMET-AI calculators and changes expert prompts to target the requested property directions. Unlike \textsc{C-Moral}, the MAMO agents do not receive the exact improvement margins, thresholds, or source-dependent preservation intervals. Both MAMO variants return 20 final candidates per input, evaluated under the C-MuMOInstruct IND metrics and selection protocol. Their iterative internal oracle cost may be higher, so equal numbers of final candidates should not be confused with equal total oracle consumption. The MAMO comparison is restricted to the IND evaluation setting.
 
 \subsection{Property-level trade-offs}
 \begin{table}[t]
 \centering\small
-\caption{BPQ means and joint constraint success, from the rebuttal.}
+\caption{Mean property scores and joint constraint success rates on the BPQ task.}
 \label{tab:bpq_tradeoffs}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccccc}\toprule
@@ -71,5 +71,5 @@ GeLLM$^4$O-C & 52.2 & 21.0 & 0.92 & 1.37 & 0.83\\
 \textsc{C-Moral}-GDPO & \textbf{69.8} & \textbf{40.2} & \textbf{0.94} & \textbf{1.57} & \textbf{0.86}\\\bottomrule
 \end{tabular}}
 \end{table}
-Although property-wise means may appear favorable, they do not tell us how often \emph{all} constraints hold on the same edited molecule. Joint SOR/SSOR complements mean property changes; these results alone do not establish Pareto optimality.
+Although property-wise means may appear favorable, they do not tell us how often \emph{all} constraints hold on the same edited molecule. Joint SOR/SSOR complements mean property changes; these results do not replace a full Pareto-front analysis.
 
