@@ -845,7 +845,7 @@ For positive scores, GM has multiplicative level sets and strongly penalizes nea
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figs/pareto_front.png}
-  \caption{Optimal solutions on a concave Pareto front. (a) Arithmetic Mean leads to extreme boundary solutions. (b) Geometric Mean forces balanced trade-offs.}
+  \caption{Illustrative aggregation trade-offs. (a) Arithmetic Mean favors an extreme solution in this example. (b) Geometric Mean favors a more balanced solution.}
   \label{fig:pareto_front}
 \end{figure}
 
@@ -854,7 +854,7 @@ For positive scores, GM has multiplicative level sets and strongly penalizes nea
 \subsection{Reward Aggregation: GRPO \& GDPO}
 \label{appendix:gm_vs_logmin}
 
-To enforce the simultaneous satisfaction of all constraints, the aggregation function must approximate the logical AND ($\min$) operator. While both Geometric Mean (GM) and -Log-Sum-Exp (LogMin) provide continuous gradients, their mathematical properties dictate their specific applications in GRPO and GDPO.
+To encourage joint constraint satisfaction, we use bottleneck-sensitive aggregation rather than allowing unrestricted additive compensation. GM and -Log-Sum-Exp (LogMin) provide different continuous feedback and have different input domains, motivating their respective use in GRPO and GDPO.
 
 \begin{figure}[t]
   \centering
@@ -869,12 +869,12 @@ For GM, defined as $R_{GM} = (\prod_{i=1}^N r_i)^{\frac{1}{N}}$, the gradient wi
 $$ \frac{\partial R_{GM}}{\partial r_j} = \frac{1}{N} \frac{R_{GM}}{r_j} $$
 This multiplicative nature ensures that the optimization of $r_j$ is holistically scaled by the performance of all other objectives.
 
-Conversely, LogMin acts as a strict bottleneck. Defined as $R_{LSE} = -\frac{1}{k} \log \sum_{i=1}^N \exp(-k \cdot x_i)$, its gradient is exactly the softmax distribution:
+Conversely, LogMin increasingly emphasizes low-scoring components as its inverse temperature grows. Defined as $R_{LSE} = -\frac{1}{k} \log \sum_{i=1}^N \exp(-k \cdot x_i)$, its gradient assigns softmax weights:
 $$ \frac{\partial R_{LSE}}{\partial x_j} = \frac{\exp(-k \cdot x_j)}{\sum_{i=1}^N \exp(-k \cdot x_i)} $$
-When $k$ is sufficiently large, if $x_j$ is the worst-performing objective, its exponential term dominates the denominator. Consequently, $\frac{\partial R_{LSE}}{\partial x_j} \to 1$, while gradients for all other objectives approach $0$. This mathematically explains the "L-shaped" contours in Figure \ref{fig:contour}(b), proving that LogMin forces the model to exclusively penalize the weakest property.
+For a uniquely lowest-scoring objective, its gradient weight approaches $1$ as $k \to \infty$, while the other weights approach $0$. At finite $k$, however, every objective contributes to the gradient. The contour plot in Figure~\ref{fig:contour}(b) illustrates this adjustable bottleneck emphasis.
 
 \paragraph{Domain Constraints}
-Beyond gradients, the mathematical domain strictly determines algorithmic compatibility:
+The domain of each aggregation function also guides its application:
 \begin{itemize}
     \item \textbf{GRPO ($r_i \in [0, 1]$):} GRPO maps raw properties to positive scores via non-linear reward shaping, perfectly satisfying the strict non-negativity requirement of the GM function.
     \item \textbf{GDPO ($A_i \in \mathbb{R}$):} GDPO optimizes pairwise advantages, which naturally span negative values. Because the standard real-valued GM is not directly applicable to negative advantages, we use LogMin as a smooth, real-valued, bottleneck-sensitive alternative; other real-valued aggregation choices are also possible.
