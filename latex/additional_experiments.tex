@@ -81,7 +81,7 @@ GDPO & 32.1 & \textbf{15.7} & 0.60 & \textbf{16.5} \\
 
 \subsection{Multi-objective baseline and comparison scope}
 \label{appendix:mamo}
-MAMO-direct follows the released multi-agent workflow without task-specific prompt changes. MAMO-adapted replaces feedback tools with the relevant RDKit/ADMET-AI calculators and changes expert prompts to target the requested property directions. Unlike \textsc{C-Moral}, the MAMO agents do not receive the exact improvement margins, thresholds, or source-dependent preservation intervals. Both MAMO variants return 20 final candidates per input, evaluated under the C-MuMOInstruct IND metrics and selection protocol. Their iterative internal oracle cost may be higher, so equal numbers of final candidates should not be confused with equal total oracle consumption. The MAMO comparison is restricted to the IND evaluation setting.
+MAMO-direct follows the released multi-agent workflow without task-specific prompt changes. MAMO-adapted replaces feedback tools with the relevant RDKit/ADMET-AI calculators and changes expert prompts to target the requested property directions. Unlike \textsc{C-Moral}, the MAMO agents do not receive the exact improvement margins, thresholds, or source-dependent preservation intervals. Both MAMO variants return 20 final candidates per input, evaluated using the C-MuMOInstruct IND and OOD splits and the same final candidate-selection procedure. MAMO-direct yields SOR/SSOR of $5.2\%/2.1\%$ (IND) and $5.1\%/2.5\%$ (OOD), while MAMO-adapted achieves $12.4\%/5.1\%$ (IND) and $10.7\%/6.0\%$ (OOD). Their iterative internal oracle cost may be higher, so equal numbers of final candidates should not be confused with equal total oracle consumption.
 
 \subsection{Property-level trade-offs}
 \begin{table}[t]
