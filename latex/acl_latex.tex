@@ -42,6 +42,7 @@
 %Including images in your LaTeX document requires adding
 %additional package(s)
 \usepackage{graphicx}
+\usepackage{tikz}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage[table]{xcolor}
@@ -652,14 +653,14 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 24.4 & 9.8 & 0.6
 
 \vspace{12pt} % 控制上下两张子图之间的垂直间距
 
-% 下方图片：新加入的雷达图 (c)
+% (c) Compact, fully editable vector comparison based on Table 2(a).
 (c)\par\vspace{2pt}
-\includegraphics[width=\textwidth,height=0.26\textheight,keepaspectratio]{figs/radar_mistral.pdf}
+\resizebox{\linewidth}{!}{\input{figs/cmoral_grpo_gdpo_focus.tex}}
 \end{minipage}
 \caption{Overall multi-objective optimization results on C-MuMOInstruct. 
 (a) Comprehensive comparison of IND and OOD performance. For RL post-training methods, main-table results report the mean over three random seeds with beam search = 20; standard deviations are reported in Table~\ref{tab:rl_algorithm_comparison}.
 (b) Relative improvement margins in SOR and SSOR over the respective SFT baselines. 
-(c) Multi-dimensional capability trade-offs on the Mistral backbone. MAMO-direct and MAMO-adapted are evaluated on both IND and OOD tasks.}
+(c) GRPO/GDPO comparison of SOR and RI across Mistral/LLaMA IND/OOD; crowns mark the higher value. MAMO-direct and MAMO-adapted are evaluated on both IND and OOD tasks.}
 \label{fig:c-mumo_benchmark}
 \end{table*}
 
