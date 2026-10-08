@@ -1,0 +1,83 @@
+\begin{tikzpicture}[x=1pt,y=1pt,baseline=(current bounding box.north),font=\sffamily\fontsize{5.5}{6.5}\selectfont]
+\definecolor{cmBlue}{HTML}{1685EE}
+\definecolor{cmOrange}{HTML}{F4772B}
+\definecolor{cmTrack}{HTML}{E6E9EE}
+\definecolor{cmInk}{HTML}{15203B}
+\draw[cmBlue,line width=.65pt,rounded corners=2pt] (0,90) rectangle (160,176);
+\draw[cmOrange,line width=.65pt,rounded corners=2pt] (0,0) rectangle (160,87);
+\node[anchor=west,font=\sffamily\bfseries\fontsize{7.5}{9}\selectfont,text=cmBlue] at (5,168) {Criterion satisfaction (SOR)};
+\node[anchor=west,font=\sffamily\bfseries\fontsize{7.5}{9}\selectfont,text=cmOrange] at (5,79) {Relative improvement (RI)};
+% Separate legends retained for both panels.
+\fill[cmBlue] (43,155) rectangle (48,158);
+\node[anchor=west,text=cmInk] at (50,156.5) {GRPO};
+\fill[cmOrange] (81,155) rectangle (86,158);
+\node[anchor=west,text=cmInk] at (88,156.5) {GDPO};
+\fill[cmBlue] (43,66) rectangle (48,69);
+\node[anchor=west,text=cmInk] at (50,67.5) {GRPO};
+\fill[cmOrange] (81,66) rectangle (86,69);
+\node[anchor=west,text=cmInk] at (88,67.5) {GDPO};
+\node[anchor=west,text=cmInk] at (5,142) {Mistral};\node[anchor=west,text=cmInk] at (5,136.5) {IND};
+\fill[cmTrack,rounded corners=.6pt] (46,142.20) rectangle (109,145.80);
+\fill[cmBlue,rounded corners=.6pt] (46,142.20) rectangle (102.01,145.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,144) {48.9};
+\fill[cmBlue] (148.6,142.5) -- (148.6,145.2) -- (149.9,144.1) -- (151.0,146.1) -- (152.1,144.1) -- (153.4,145.2) -- (153.4,142.5) -- cycle;
+\fill[cmTrack,rounded corners=.6pt] (46,136.80) rectangle (109,140.40);
+\fill[cmOrange,rounded corners=.6pt] (46,136.80) rectangle (99.84,140.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,138.6) {47.0};
+\node[anchor=west,text=cmInk] at (5,128) {LLaMA};\node[anchor=west,text=cmInk] at (5,122.5) {IND};
+\fill[cmTrack,rounded corners=.6pt] (46,128.20) rectangle (109,131.80);
+\fill[cmBlue,rounded corners=.6pt] (46,128.20) rectangle (92.05,131.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,130) {40.2};
+\fill[cmTrack,rounded corners=.6pt] (46,122.80) rectangle (109,126.40);
+\fill[cmOrange,rounded corners=.6pt] (46,122.80) rectangle (95.71,126.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,124.6) {43.4};
+\fill[cmOrange] (148.6,123.1) -- (148.6,125.8) -- (149.9,124.7) -- (151.0,126.7) -- (152.1,124.7) -- (153.4,125.8) -- (153.4,123.1) -- cycle;
+\node[anchor=west,text=cmInk] at (5,114) {Mistral};\node[anchor=west,text=cmInk] at (5,108.5) {OOD};
+\fill[cmTrack,rounded corners=.6pt] (46,114.20) rectangle (109,117.80);
+\fill[cmBlue,rounded corners=.6pt] (46,114.20) rectangle (91.25,117.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,116) {39.5};
+\fill[cmBlue] (148.6,114.5) -- (148.6,117.2) -- (149.9,116.1) -- (151.0,118.1) -- (152.1,116.1) -- (153.4,117.2) -- (153.4,114.5) -- cycle;
+\fill[cmTrack,rounded corners=.6pt] (46,108.80) rectangle (109,112.40);
+\fill[cmOrange,rounded corners=.6pt] (46,108.80) rectangle (89.87,112.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,110.6) {38.3};
+\node[anchor=west,text=cmInk] at (5,100) {LLaMA};\node[anchor=west,text=cmInk] at (5,94.5) {OOD};
+\fill[cmTrack,rounded corners=.6pt] (46,100.20) rectangle (109,103.80);
+\fill[cmBlue,rounded corners=.6pt] (46,100.20) rectangle (88.61,103.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,102) {37.2};
+\fill[cmBlue] (148.6,100.5) -- (148.6,103.2) -- (149.9,102.1) -- (151.0,104.1) -- (152.1,102.1) -- (153.4,103.2) -- (153.4,100.5) -- cycle;
+\fill[cmTrack,rounded corners=.6pt] (46,94.80) rectangle (109,98.40);
+\fill[cmOrange,rounded corners=.6pt] (46,94.80) rectangle (86.78,98.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,96.6) {35.6};
+\node[anchor=west,text=cmInk] at (5,53) {Mistral};\node[anchor=west,text=cmInk] at (5,47.5) {IND};
+\fill[cmTrack,rounded corners=.6pt] (46,53.20) rectangle (109,56.80);
+\fill[cmBlue,rounded corners=.6pt] (46,53.20) rectangle (96.45,56.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,55) {96.1};
+\fill[cmTrack,rounded corners=.6pt] (46,47.80) rectangle (109,51.40);
+\fill[cmOrange,rounded corners=.6pt] (46,47.80) rectangle (103.96,51.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,49.6) {110.4};
+\fill[cmOrange] (148.6,48.1) -- (148.6,50.8) -- (149.9,49.7) -- (151.0,51.7) -- (152.1,49.7) -- (153.4,50.8) -- (153.4,48.1) -- cycle;
+\node[anchor=west,text=cmInk] at (5,39) {LLaMA};\node[anchor=west,text=cmInk] at (5,33.5) {IND};
+\fill[cmTrack,rounded corners=.6pt] (46,39.20) rectangle (109,42.80);
+\fill[cmBlue,rounded corners=.6pt] (46,39.20) rectangle (99.86,42.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,41) {102.6};
+\fill[cmTrack,rounded corners=.6pt] (46,33.80) rectangle (109,37.40);
+\fill[cmOrange,rounded corners=.6pt] (46,33.80) rectangle (103.91,37.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,35.6) {110.3};
+\fill[cmOrange] (148.6,34.1) -- (148.6,36.8) -- (149.9,35.7) -- (151.0,37.7) -- (152.1,35.7) -- (153.4,36.8) -- (153.4,34.1) -- cycle;
+\node[anchor=west,text=cmInk] at (5,25) {Mistral};\node[anchor=west,text=cmInk] at (5,19.5) {OOD};
+\fill[cmTrack,rounded corners=.6pt] (46,25.20) rectangle (109,28.80);
+\fill[cmBlue,rounded corners=.6pt] (46,25.20) rectangle (56.24,28.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,27) {19.5};
+\fill[cmTrack,rounded corners=.6pt] (46,19.80) rectangle (109,23.40);
+\fill[cmOrange,rounded corners=.6pt] (46,19.80) rectangle (60.28,23.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,21.6) {27.2};
+\fill[cmOrange] (148.6,20.1) -- (148.6,22.8) -- (149.9,21.7) -- (151.0,23.7) -- (152.1,21.7) -- (153.4,22.8) -- (153.4,20.1) -- cycle;
+\node[anchor=west,text=cmInk] at (5,11) {LLaMA};\node[anchor=west,text=cmInk] at (5,5.5) {OOD};
+\fill[cmTrack,rounded corners=.6pt] (46,11.20) rectangle (109,14.80);
+\fill[cmBlue,rounded corners=.6pt] (46,11.20) rectangle (51.51,14.80);
+\node[anchor=east,text=cmBlue,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,13) {10.5};
+\fill[cmTrack,rounded corners=.6pt] (46,5.80) rectangle (109,9.40);
+\fill[cmOrange,rounded corners=.6pt] (46,5.80) rectangle (56.03,9.40);
+\node[anchor=east,text=cmOrange,font=\sffamily\bfseries\fontsize{5.5}{6}\selectfont] at (143,7.6) {19.1};
+\fill[cmOrange] (148.6,6.1) -- (148.6,8.8) -- (149.9,7.7) -- (151.0,9.7) -- (152.1,7.7) -- (153.4,8.8) -- (153.4,6.1) -- cycle;
+\end{tikzpicture}
