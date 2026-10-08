@@ -154,14 +154,12 @@ Practical molecular optimization in drug discovery is rarely a matter of simply 
 % \YS{Suggestion: Despite these recent efforts, true control is still a major struggle. Most models try to cheat to have high scores while making tiny, illegal changes that actually break the molecule’s basic structure. Changing the core scaffold is a serious problem, since it becomes completely useless if a molecule breaks even one rule.}
 
 
-Despite its practical importance, controllable molecular optimization remains challenging. The difficulty lies not in improving molecular properties alone, but in doing so under explicit, property-wise requirements: a model must improve deficient attributes while preserving those already meeting target criteria based on source molecules. Existing methods struggle to satisfy such fine-grained control reliably.
-RL-based approaches typically optimize a scalarized reward over multiple objectives \cite{wang2024multi, park2025mol}, which can lead to brittle trade-offs under strict and competing constraints. LLM-based approaches adapted by SFT or prompting can leverage strong chemical priors \cite{ye2023drugassistlargelanguagemodel}, but they often treat chemical constraints as soft instructions rather than hard requirements. As a result, they may achieve apparent score improvements through undesired edits, such as altering the core scaffold or violating preservation constraints \cite{guo2023largelanguagemodelschemistry}.
+Controllable lead optimization differs from maximizing a single global property score: whether an attribute should be improved or preserved depends on the \emph{source molecule}. Its heterogeneous improvement margins and preservation intervals must be satisfied together; an additive reward can allow a large gain on an easy objective to compensate for violating a critical one \cite{wang2024multi,park2025mol}. Meanwhile, prompted or supervised molecular LLMs may not consistently obey numeric property constraints \cite{ye2023drugassistlargelanguagemodel}. This motivates \emph{source-conditioned, property-wise alignment}, which converts heterogeneous instructions into jointly evaluated optimization feedback.
 
 
 To achieve genuine, controllable optimization and overcome the limitations of both traditional RL and SFT paradigms, we introduce \textsc{C-Moral}, a constraint-aware reinforcement learning post-training framework designed specifically for molecular LLMs. \textsc{C-Moral} stands for \textbf{C}ontrollable Multi-\textbf{O}bjective \textbf{M}olecular \textbf{O}ptimization with \textbf{R}einforcement \textbf{A}lignment for \textbf{L}LMs. An overview of the framework is shown in Figure~\ref{fig:framework}. 
 
-\textsc{C-Moral} aims to bridge the gap between the robust chemical priors of LLMs and the strict multi-objective demands of lead optimization. Rather than introducing a new policy-gradient estimator, 
-\textsc{C-MORAL} provides a task-specific RL alignment formulation for controllable molecular editing. Its main contribution lies in constraint-aware reward construction and group-relative training under heterogeneous molecular objectives. The key idea is to align molecular LLMs with property-wise scientific constraints through calibrated property scores, bottleneck-sensitive reward aggregation, and group-relative feedback. 
+Rather than proposing a new policy-gradient estimator, \textsc{C-Moral} contributes a task-specific \emph{source-conditioned reward alignment} formulation. The method partitions each source molecule's objectives into required improvements and preservation constraints, maps them to comparable continuous preference scores, and applies bottleneck-sensitive aggregation so that one easy property cannot simply offset a violated constraint. Existing group-relative optimizers then learn a conditional editing policy from these signals. 
 
 Specifically, we adapt two group-relative RL algorithms, Group Relative Policy Optimization (GRPO)~\cite{shao2024deepseekmathpushinglimitsmathematical} and Group Reward-Decoupled Normalization Policy Optimization (GDPO)~\cite{liu2026gdpogrouprewarddecouplednormalization}, to instantiate two complementary variants of \textsc{C-Moral}. \textsc{C-Moral}-GRPO evaluates candidate molecules relative to peers generated from the same prompt and uses a sigmoid-aligned geometric mean reward to penalize property bottlenecks. \textsc{C-Moral}-GDPO further decouples property-wise feedback and aggregates it with a smooth-min objective to reduce the implicit sacrifice of any attribute. Since both variants avoid a separate memory-intensive value network, they improve training efficiency and memory utilization.
 
@@ -170,9 +168,9 @@ Evaluated on the stringent C-MuMOInstruct benchmark~\cite{dey2025large} and S$^2
     \setlength{\itemsep}{0pt}
     \setlength{\parskip}{0pt}
     \setlength{\parsep}{0pt}
-    \item We propose \textsc{C-Moral}, a constraint-aware RL post-training framework for controllable multi-objective molecular optimization with LLMs.
-    \item We introduce a property-aware reward design that combines sigmoid score alignment with bottleneck-sensitive non-linear aggregation, and instantiate it with group-relative RL through \textsc{GRPO} and \textsc{GDPO}.
-    \item \textsc{C-Moral} achieves the best performance among compared methods on two molecular optimization benchmarks, C-MuMOInstruct and S$^2$-Bench MolOpt, with the highest \textsc{SOR} on both in-domain and out-of-domain C-MuMOInstruct tasks and the strongest MolOpt results across LogP, MR, and QED.
+    \item We formulate task-specific reward alignment for source-conditioned editing with simultaneous property improvement and preservation constraints.
+    \item We calibrate heterogeneous objectives with property-wise sigmoid scores and aggregate bottlenecks through GRPO/GDPO post-training, without introducing a new policy-gradient estimator.
+    \item Across two benchmarks and multiple backbones, the method improves constrained success; ablations and single-candidate decoding provide evidence beyond reward-free tuning or test-time reranking.
 \end{itemize}
 
 
@@ -193,7 +191,7 @@ Molecular generation has been studied with SMILES-based sequence models, graph g
 
 \subsection{Molecular Optimization}
 
-Molecular optimization aims to improve desired properties while maintaining chemical validity and structural fidelity. Existing approaches include heuristic search, reinforcement learning, and deep generative modeling \cite{gomez2018automatic,zhou2019optimization,walters2020applications,olivecrona2017molecular,wang2023retrievalbasedcontrollablemoleculegeneration}, with action spaces ranging from token-level SMILES editing to graph construction and continuous structure refinement \cite{erikawa2023gargoyles,barrett2024reinforcement}. However, multi-objective molecular optimization remains challenging because scalarized rewards can lead to brittle trade-offs under competing objectives and hard constraints \cite{brown2019guacamol,wang2024multi}. Recent LLM-based methods such as LICO and MOLLEO explore in-context surrogate modeling and evolutionary search for molecular design \cite{nguyen2025licolargelanguagemodels,wang2025efficientevolutionarysearchchemical}, while REPO studies GRPO-style post-training for instruction-based molecular generation \cite{li2026reference}. In contrast, our work focuses on controllable multi-objective molecular editing, where deficient properties must be selectively improved while near-optimal properties and scaffold similarity are preserved.
+Molecular optimization aims to improve desired properties while maintaining chemical validity and structural fidelity. Existing approaches include heuristic search, reinforcement learning, and deep generative modeling \cite{gomez2018automatic,zhou2019optimization,walters2020applications,olivecrona2017molecular,wang2023retrievalbasedcontrollablemoleculegeneration}, with action spaces ranging from token-level SMILES editing to graph construction and continuous structure refinement \cite{erikawa2023gargoyles,barrett2024reinforcement}. However, multi-objective molecular optimization remains challenging because scalarized rewards can lead to brittle trade-offs under competing objectives and hard constraints \cite{brown2019guacamol,wang2024multi}. Recent LLM-based methods such as LICO and MOLLEO explore in-context surrogate modeling and evolutionary search \cite{nguyen2025licolargelanguagemodels,wang2025efficientevolutionarysearchchemical}, while REPO studies GRPO-style molecular post-training \cite{li2026reference}. MAMO uses expert-inspired multi-agent coordination to optimize multiple molecular properties \cite{zeng2026mamo}. Unlike global search-oriented objectives, our focus is source-conditioned editing under explicit improvement and preservation intervals.
 
 
 
@@ -894,6 +892,8 @@ Beyond gradients, the mathematical domain strictly determines algorithmic compat
 \end{figure*}
 
 
+
+\input{latex/naacl_rebuttal_appendix.tex}
 
 \section{Details on Dataset}
 \label{appendix:dataset}
