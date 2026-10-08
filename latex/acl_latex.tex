@@ -655,7 +655,13 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 24.4 & 9.8 & 0.6
 
 % (c) Compact, fully editable vector comparison based on Table 2(a).
 (c)\par\vspace{2pt}
-\resizebox{\linewidth}{!}{\input{figs/cmoral_grpo_gdpo_focus.tex}}
+% Render the supplied two-panel SOR/RI PDF directly when present.
+% The previous vector figure remains a compilable fallback until the PDF is uploaded.
+\IfFileExists{figs/cmoral_table2c_sor_ri.pdf}{%
+  \includegraphics[width=\linewidth]{figs/cmoral_table2c_sor_ri.pdf}%
+}{%
+  \resizebox{\linewidth}{!}{\input{figs/cmoral_grpo_gdpo_focus.tex}}%
+}
 \end{minipage}
 \caption{Overall multi-objective optimization results on C-MuMOInstruct. 
 (a) Comprehensive comparison of IND and OOD performance. For RL post-training methods, main-table results report the mean over three random seeds with beam search = 20; standard deviations are reported in Table~\ref{tab:rl_algorithm_comparison}.
