@@ -1,0 +1,2503 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[review]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{cuted}
+\usepackage{caption}
+\usepackage[table]{xcolor}
+\usepackage{placeins}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xurl}
+\usepackage{hyperref}
+\usepackage[normalem]{ulem}
+\usepackage{color}
+\usepackage{xcolor}
+\newcommand{\YS}[1]{\textcolor{blue}{\emph{[YS: #1]}}}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% This is also not strictly necessary, and may be commented out.
+% However, it will improve the aesthetics of text in
+% the typewriter font.
+\usepackage{inconsolata}
+
+%Including images in your LaTeX document requires adding
+%additional package(s)
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[table]{xcolor}
+\usepackage{makecell}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{balance}
+\usepackage{subcaption}
+\usepackage{caption}
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\title{C-MORAL: Controllable Multi-Objective Molecular Optimization with Reinforcement Alignment for LLMs}
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a separate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+\author{Rui Gao \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\}
+
+%\author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+%\\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+%\\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+%\\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+%\\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+%\\
+%\\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+%\\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+%}
+
+\begin{document}
+
+
+\maketitle
+\begin{abstract}
+% Large language models (LLMs) show promise for molecular optimization, but aligning them with selective and competing drug-design constraints remains challenging. To address this, we propose \textsc{C-Moral}, a reinforcement learning post-training framework for controllable multi-objective molecular optimization. \textsc{C-Moral} combines group-based relative optimization, property score alignment for heterogeneous objectives, and continuous non-linear reward aggregation to improve stability and balance across competing properties. Experiments on the C-MuMO benchmark show that \textsc{C-Moral} consistently outperforms strong instruction-tuned baselines, achieving a nearly 19\% relative improvement in strict success rate and a 45\% gain in relative targeted-property improvement while preserving scaffold similarity. These results suggest that RL post-training is an effective approach for aligning molecular language models with continuous molecular design objectives.
+Large language models (LLMs) show promise for molecular optimization, but aligning them with selective and competing drug-design constraints remains challenging. We propose \textsc{C-Moral}, a reinforcement learning post-training framework for controllable multi-objective molecular optimization. \textsc{C-Moral} combines group-based relative optimization, property score alignment for heterogeneous objectives, and bottleneck-sensitive non-linear reward aggregation to improve stability across competing molecular properties. Experiments on C-MuMOInstruct and S$^2$-Bench MolOpt show that \textsc{C-Moral} achieves the best performance among compared methods on both benchmarks. On C-MuMOInstruct, \textsc{C-Moral} achieves the best Success Optimized Rate (\textsc{SOR}) of $48.9$\% on in-domain tasks and $39.5$\% on out-of-domain tasks while preserving scaffold similarity. On S$^2$-Bench MolOpt, it also achieves the strongest results across LogP, MR, and QED optimization tasks. These results suggest that \textsc{C-MORAL} is an effective way to align molecular LLMs with continuous and constrained molecular design objectives. 
+\end{abstract}
+
+
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth, height=0.9\textheight, keepaspectratio]{figs/framework.png}
+  \caption{Overview of \textsc{C-MORAL} generation and training pipeline}
+  \label{fig:framework}
+\end{figure*}
+
+\section{Introduction}
+
+Drug discovery is a lengthy and costly process, with the hit-to-lead transition and the lead optimization stage being particularly critical \cite{katsuno2015hit, sadybekov2023computational}. This process is inherently a multi-objective optimization (MOO) problem \cite{guan2019admet}. 
+
+Practical molecular optimization in drug discovery is rarely a matter of simply improving all properties \cite{fialkova2021libinvent}. In many cases, a lead compound already approaches desirable levels in a subset of attributes; therefore, optimization requires selective improvement of the remaining deficient properties while maintaining those that already meet the target criteria, and simultaneously preserving the core scaffold and synthetic feasibility \cite{zhou2024decompoptcontrollabledecomposeddiffusion}. For example, ControllableGPT \cite{liu2025controllablegpt} aims to increase binding affinity while preserving the core scaffold by making minimal, targeted edits that remove liabilities. Such tasks have been formalized as a benchmark setting for controllable multi-property, multi-objective optimization (C-MuMO) \cite{dey2025large}. C-MuMO highlights the need to specify property-wise objectives and thresholds for either improvement or preservation, thereby better reflecting the fine-grained requirements of real medicinal chemistry. In this context, ``controllable'' means that the model must follow explicit, property-wise directives---improving only the deficient attributes while preserving those already satisfying target criteria---instead of indiscriminately maximizing a single aggregate objective.
+
+% \YS{I think we need to explain more specifically what controllable optimization is and why the issue is serious here.}
+
+
+% \YS{Suggestion: Despite these recent efforts, true control is still a major struggle. Most models try to cheat to have high scores while making tiny, illegal changes that actually break the molecule’s basic structure. Changing the core scaffold is a serious problem, since it becomes completely useless if a molecule breaks even one rule.}
+
+
+Despite its practical importance, controllable molecular optimization remains challenging. The difficulty lies not in improving molecular properties alone, but in doing so under explicit, property-wise requirements: a model must improve deficient attributes while preserving those already meeting target criteria based on source molecules. Existing methods struggle to satisfy such fine-grained control reliably.
+RL-based approaches typically optimize a scalarized reward over multiple objectives \cite{wang2024multi, park2025mol}, which can lead to brittle trade-offs under strict and competing constraints. LLM-based approaches adapted by SFT or prompting can leverage strong chemical priors \cite{ye2023drugassistlargelanguagemodel}, but they often treat chemical constraints as soft instructions rather than hard requirements. As a result, they may achieve apparent score improvements through undesired edits, such as altering the core scaffold or violating preservation constraints \cite{guo2023largelanguagemodelschemistry}.
+
+
+To achieve genuine, controllable optimization and overcome the limitations of both traditional RL and SFT paradigms, we introduce \textsc{C-Moral}, a constraint-aware reinforcement learning post-training framework designed specifically for molecular LLMs. \textsc{C-Moral} stands for \textbf{C}ontrollable Multi-\textbf{O}bjective \textbf{M}olecular \textbf{O}ptimization with \textbf{R}einforcement \textbf{A}lignment for \textbf{L}LMs. An overview of the framework is shown in Figure~\ref{fig:framework}. 
+
+\textsc{C-Moral} aims to bridge the gap between the robust chemical priors of LLMs and the strict multi-objective demands of lead optimization. Rather than introducing a new policy-gradient estimator, 
+\textsc{C-MORAL} provides a task-specific RL alignment formulation for controllable molecular editing. Its main contribution lies in constraint-aware reward construction and group-relative training under heterogeneous molecular objectives. The key idea is to align molecular LLMs with property-wise scientific constraints through calibrated property scores, bottleneck-sensitive reward aggregation, and group-relative feedback. 
+
+Specifically, we adapt two group-relative RL algorithms, Group Relative Policy Optimization (GRPO)~\cite{shao2024deepseekmathpushinglimitsmathematical} and Group Reward-Decoupled Normalization Policy Optimization (GDPO)~\cite{liu2026gdpogrouprewarddecouplednormalization}, to instantiate two complementary variants of \textsc{C-Moral}. \textsc{C-Moral}-GRPO evaluates candidate molecules relative to peers generated from the same prompt and uses a sigmoid-aligned geometric mean reward to penalize property bottlenecks. \textsc{C-Moral}-GDPO further decouples property-wise feedback and aggregates it with a smooth-min objective to reduce the implicit sacrifice of any attribute. Since both variants avoid a separate memory-intensive value network, they improve training efficiency and memory utilization.
+
+Evaluated on the stringent C-MuMOInstruct benchmark~\cite{dey2025large} and S$^2$-Bench MolOpt, our framework significantly outperforms strong baselines. In summary, our main contributions are:
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}
+    \item We propose \textsc{C-Moral}, a constraint-aware RL post-training framework for controllable multi-objective molecular optimization with LLMs.
+    \item We introduce a property-aware reward design that combines sigmoid score alignment with bottleneck-sensitive non-linear aggregation, and instantiate it with group-relative RL through \textsc{GRPO} and \textsc{GDPO}.
+    \item \textsc{C-Moral} achieves the best performance among compared methods on two molecular optimization benchmarks, C-MuMOInstruct and S$^2$-Bench MolOpt, with the highest \textsc{SOR} on both in-domain and out-of-domain C-MuMOInstruct tasks and the strongest MolOpt results across LogP, MR, and QED.
+\end{itemize}
+
+
+
+
+
+
+\section{Related Work}
+\label{sec:related-work}
+
+\subsection{Group-based Policy Optimization}
+
+Compared with PPO, which relies on an additional critic network, GRPO removes the value model by normalizing rewards within a sampled candidate group, thereby reducing computational overhead \cite{shao2024deepseekmathpushinglimitsmathematical}. GDPO further extends this idea by decoupling advantage normalization across reward dimensions, making it suitable for multi-reward settings with conflicting objectives \cite{liu2026gdpogrouprewarddecouplednormalization}. Our work builds on group-relative policy optimization, but does not introduce a new policy-gradient estimator. Instead, we adapt it to controllable molecular editing through property score alignment and bottleneck-sensitive reward aggregation under heterogeneous molecular constraints.
+
+\subsection{Molecular Language Models and Generative Models}
+
+Molecular generation has been studied with SMILES-based sequence models, graph generative models, and continuous structure refinement methods. Since SMILES represents molecules as sequences \cite{weininger1988smiles}, language modeling has become a natural paradigm for molecular generation. MolGPT treats molecule generation as autoregressive SMILES modeling \cite{bagal2021molgpt}, while MolT5 formulates molecules and natural language as a sequence-to-sequence translation problem \cite{edwards2022translationmoleculesnaturallanguage}. Recent LLM-based systems further support molecular understanding and interaction, including LLaMo \cite{park2024llamolargelanguagemodelbased} and ChatDrug \cite{liu2023chatgptpoweredconversationaldrugediting}. These models demonstrate the promise of language models for chemistry, but are not primarily designed for strict controllable multi-objective optimization with property-wise improvement and preservation constraints.
+
+\subsection{Molecular Optimization}
+
+Molecular optimization aims to improve desired properties while maintaining chemical validity and structural fidelity. Existing approaches include heuristic search, reinforcement learning, and deep generative modeling \cite{gomez2018automatic,zhou2019optimization,walters2020applications,olivecrona2017molecular,wang2023retrievalbasedcontrollablemoleculegeneration}, with action spaces ranging from token-level SMILES editing to graph construction and continuous structure refinement \cite{erikawa2023gargoyles,barrett2024reinforcement}. However, multi-objective molecular optimization remains challenging because scalarized rewards can lead to brittle trade-offs under competing objectives and hard constraints \cite{brown2019guacamol,wang2024multi}. Recent LLM-based methods such as LICO and MOLLEO explore in-context surrogate modeling and evolutionary search for molecular design \cite{nguyen2025licolargelanguagemodels,wang2025efficientevolutionarysearchchemical}, while REPO studies GRPO-style post-training for instruction-based molecular generation \cite{li2026reference}. In contrast, our work focuses on controllable multi-objective molecular editing, where deficient properties must be selectively improved while near-optimal properties and scaffold similarity are preserved.
+
+
+
+
+
+
+
+\section{Method}
+
+\subsection{Problem Formulation}
+
+We formulate Controllable Multi-objective Molecule Optimization (C-MuMO) as a constrained generation task. Given an initial sub-optimal ``hit'' molecule $M_x$ and a natural language instruction $I$, the objective is to generate an optimized ``lead'' molecule $M_y$ that selectively improves specific molecular properties up to pharmaceutically relevant levels, while maintaining others that already meet the criteria \cite{dey2025large}.
+
+Let $\mathcal{P}$ denote the set of target pharmacological properties. For each property $p \in \mathcal{P}$, we define a pharmaceutically relevant threshold $\Theta_p$ and an improvement/stability margin $\Delta_p$. Based on the initial molecule $M_x$, the properties are partitioned into two disjoint subsets: 
+\begin{itemize}
+    \item Sub-optimal properties ($\mathcal{P}_i$): Properties that require targeted enhancement, defined as $\mathcal{P}_i = \{p \in \mathcal{P} \mid p(M_x) \mbox{ is worse than } \Theta_p\}$.
+    \item Near-optimal properties ($\mathcal{P}_s$): Properties that already meet the criteria and must be preserved, defined as $\mathcal{P}_s = \{p \in \mathcal{P} \mid p(M_x) \mbox{ is better than or equal to } \Theta_p\}$.
+\end{itemize}
+
+Detailed values of $\Delta_p$ and $\Theta_p$ for different properties are given in Table \ref{tab:dataset_summary}. 
+
+
+
+The generation policy $\pi_\Theta(M_y \mid M_x, I)$, parameterized by an LLM, is required to generate $M_y$ that satisfies three non-differentiable constraints simultaneously. 
+First, the structural similarity between $M_x$ and $M_y$, measured by Tanimoto similarity~\cite{bajusz2015tanimoto}, must remain above a predefined threshold. 
+Second, for each sub-optimal property $p \in \mathcal{P}_i$, the generated molecule must improve in the desired direction. 
+Specifically, we define an optimization direction $d_p \in \{+1,-1\}$, where $d_p=+1$ indicates that $p$ should be increased and $d_p=-1$ indicates that $p$ should be decreased; successful improvement requires
+$d_p\bigl(p(M_y)-p(M_x)\bigr) \ge \Delta_p$. 
+Third, each near-optimal property $p \in \mathcal{P}_s$ must remain stable, with its absolute deviation bounded by $\Delta_p$, i.e., $|p(M_y)-p(M_x)| \le \Delta_p$.
+
+
+
+
+
+\subsection{Property Score Sigmoid Alignment}
+
+Molecular properties inherently exist on vastly different scales. Directly aggregating raw values creates severe instability. To address this, we introduce a property-specific score shaping mechanism that normalizes all metrics into a unified $[0, 1]$ preference space. 
+
+Let $\sigma(x) = 1 / (1 + \exp(-x))$ denote the standard sigmoid function. For brevity, let $v_p$ denote the realized property value $v_p(M_y)$ of the generated molecule. For sub-optimal properties, we set the target threshold $T_p$ according to the desired optimization direction. 
+The direction-aware improvement score is defined as
+\[
+s_p^{\mathrm{imp}}
+=
+\sigma\left(\alpha_p \cdot d_p \cdot (v_p - T_p)\right),
+\]
+where $d_p=+1$ for properties to be increased and $d_p=-1$ for properties to be decreased. Crucially, we parameterize $\alpha_p$ to be inversely proportional to the property-specific margin $\Delta_p$ (i.e., $\alpha_p \propto 5/\Delta_p$). This scaling ensures that achieving the required $\Delta_p$ for any metric---regardless of its original numerical scale---maps to an equivalent reward magnitude. It also prevents metrics with naturally broader ranges from dominating the gradient updates and reduces over-optimization of any single property due to saturation effects.
+
+Conversely, for near-optimal properties ($\mathcal{P}_s$), the property must be constrained within a strict tolerance band $[L_p, U_p]$, where $L_p = p(M_x) - \Delta_p$ and $U_p = p(M_x) + \Delta_p$. To heavily penalize deviations, we design a Double Sigmoid score function:
+\begin{equation}
+  \label{eq:double_sigmoid}
+  s^{stab}_p = \sigma(\alpha_p \cdot (U_p - v_p)) \cdot \sigma(\alpha_p \cdot (v_p - L_p))
+\end{equation}
+This effective formulation creates a high-reward ``plateau'' within the acceptable range and imposes exponential decay upon any boundary violation.
+\subsection{Reward Aggregation}
+Each $s_p$ denotes a property-level continuous preference score computed from the realized molecular property value $v_p$. After obtaining these property-level scores, we aggregate them using the geometric mean to enforce the simultaneous satisfaction of all constraints. Let $N = |\mathcal{P}_i| + |\mathcal{P}_s|$. The total reward $R_{total}(M_y)$ is:
+\begin{equation}
+  \label{eq:geometric_mean}
+  R_{total}(M_y) = \left( \prod_{p \in \mathcal{P}_i} s^{imp}_p \prod_{q \in \mathcal{P}_s} s^{stab}_q \right)^{\frac{1}{N}}
+\end{equation}
+Here, we deliberately employ the geometric mean rather than the standard arithmetic mean (linear scalarization) because it can be viewed as a continuous approximation of a $min$ operator. The full explanation is in Appendix \ref{appendix:aggregation}.
+
+\subsection{GRPO Optimization}
+% % For a given prompt, the policy $\pi_\Theta$ samples a group of $G$ candidates $\mathcal{G} = \{y_1, \dots, y_G\}$. For each $y_i$, we compute its holistic reward $R_i = R_{total}(y_i)$. We then normalize these rewards to compute the relative advantage $A_i$:
+% % \begin{equation}
+% %   \label{eq:grpo_advantage}
+% %   A_i^{GRPO} = \frac{R_i - \mu_{\mathcal{G}}}{\sigma_{\mathcal{G}} + \epsilon}
+% % \end{equation}
+% % where $\mu_{\mathcal{G}}$ and $\sigma_{\mathcal{G}}$ are the mean and standard deviation of rewards within $\mathcal{G}$.
+
+% % To optimize the policy, we first define the clipped surrogate objective $J_i(\Theta)$ for each candidate, where $\rho_i = \pi_\Theta(y_i) / \pi_{ref}(y_i)$ is the importance ratio:
+% % \begin{equation}
+% %   \label{eq:grpo_surrogate}
+% %   J_i(\Theta) = \min \left( \rho_i A_i^{GRPO}, \mbox{clip}(\rho_i, 1-\epsilon_c, 1+\epsilon_c) A_i^{GRPO} \right)
+% % \end{equation}
+
+The final \textsc{C-Moral}-GRPO policy follows the same loss $\mathcal{L}_{GRPO}(\Theta)$ in \cite{shao2024deepseekmathpushinglimitsmathematical}, employing an explicit KL divergence penalty to prevent catastrophic deviation from the reference model $\pi_{ref}$:
+\begin{equation}
+  \label{eq:grpo_loss}
+  \mathcal{L}_{GRPO}(\Theta) = - \frac{1}{G} \sum_{i=1}^{G} \left[ J_i(\Theta) - \beta \mathbb{D}_{KL}(\pi_\Theta \| \pi_{ref}) \right]
+\end{equation}
+By decoupling the absolute reward magnitude, \textsc{C-Moral}-GRPO inherently preserves structural diversity and circumvents policy peaking. Detailed implementation is provided in Appendix \ref{appendix:grpo_implementation}.
+
+\subsection{GDPO Optimization}
+To explicitly disentangle conflicting multi-objective feedback, we propose \textsc{C-Moral}-GDPO. Rather than normalizing a single scalarized reward, GDPO evaluates relative superiority independently for each property across the generated group $\mathcal{G}$. These decoupled, property-specific advantages are then aggregated using a Log-Sum-Exp formulation. 
+ \textsc{C-Moral}-GDPO mitigates the risk of ``reward dominance,'' ensuring that easily optimized properties do not overshadow stricter constraints and preventing the implicit sacrifice of critical targets. Detailed mathematical formulations for the decoupled advantage and the aggregated loss are deferred to Appendix \ref{appendix:gdpo_implementation}. Further analysis of the reward aggregation choices is provided in Appendix \ref{appendix:gm_vs_logmin}.
+
+
+% \section{Experimental Setup}
+% % We evaluate the \textsc{C-Moral} framework (\textbf{C}ontrollable Multi-\textbf{O}bjective \textbf{M}olecular \textbf{O}ptimization with \textbf{R}einforcement \textbf{A}lignment for \textbf{L}LMs), which integrates customized non-linear property reward design, strict stability constraints, and group-aware advantage aggregation through both GRPO and GDPO. We conduct experiments on two widely adopted open-weight large language models, \textsc{LLaMA} \cite{touvron2023llamaopenefficientfoundation} and \textsc{Mistral} \cite{jiang2023mistral7b}. Our study focuses on the 7B scale to provide a controlled evaluation under a practical and commonly used model size. To isolate the effect of RL post-training, all policy models are initialized from the same SFT checkpoints provided by Dey et al., namely GeLLM$^4$O-C \cite{dey2025large}, and are evaluated under the same benchmark and protocol. The subsequent reinforcement learning post-training is implemented using a custom training pipeline inspired by the efficient design of the veRL framework \cite{Sheng_2025}.
+% We evaluate the \textsc{C-Moral} framework (\textbf{C}ontrollable Multi-\textbf{O}bjective \textbf{M}olecular \textbf{O}ptimization with \textbf{R}einforcement \textbf{A}lignment for \textbf{L}LMs) on the following settings. We conduct experiments on three base models: two open-weight 7B LLMs, \textsc{LLaMA} \cite{touvron2023llamaopenefficientfoundation} and \textsc{Mistral} \cite{jiang2023mistral7b}, and a domain-specialized molecule Transformer model, \textsc{MolT5} \cite{edwards2022translationmoleculesnaturallanguage}. The 7B LLM setting provides a practical and controlled scale for evaluating RL post-training, while \textsc{MolT5} serves as an expert molecular backbone. To isolate the effect of RL post-training, the LLM policies are initialized from the same SFT checkpoints provided by Dey et al., namely GeLLM$^4$O-C \cite{dey2025large}; for \textsc{MolT5}, we first perform SFT on the molecular optimization dataset before applying RL post-training. All policy models are evaluated under the same benchmark protocol, including both the C-MuMOInstruct and the Mol-Opt task from S$^2$-Bench MolOpt \cite{li2025speaktostructureevaluatingllmsopendomain}. The RL training is implemented using a custom training pipeline inspired by the efficient design of the veRL framework \cite{Sheng_2025}.
+
+% \subsection{Datasets and Tasks}
+% To evaluate the proposed framework, we use two molecule optimization benchmarks, C-MuMOInstruct \cite{dey2025large} and S$^2$-Bench MolOpt \cite{li2025speaktostructureevaluatingllmsopendomain}. Both benchmarks require the model to generate a target molecule conditioned on a given source molecule and optimization instruction, rather than generating molecules from scratch.
+% For C-MuMOInstruct, we evaluate the model on 10 distinct molecular optimization tasks. To assess performance under different levels of distribution shift, we group these tasks into In-Domain (IND) and Out-of-Domain (OOD) settings, as summarized in Table \ref{tab:dataset_summary}. The IND tasks evaluate the model on property combinations that are closer to the training distribution, while the OOD tasks examine performance on unseen property constraints and scaffold conditions.
+
+% For S$^2$-Bench MolOpt, we further evaluate the model on three goal-oriented molecule optimization subtasks, including molecular refractivity (MR), quantitative estimation of drug-likeness (QED), and LogP optimization with structural similarity preservation. Given an input molecule and a natural language instruction, the model is required to generate an optimized molecule that satisfies the desired property objective while maintaining a reasonable structural relationship with the original molecule.
+
+
+% \begin{table}[t]
+% \centering
+% \small
+% \setlength{\tabcolsep}{4pt} % 稍微收紧列间距
+
+% % ================= 上半部：任务与属性组合 =================
+% \begin{tabular}{@{}cll@{}}
+% \toprule
+% \textbf{Type} & \textbf{Task} & \textbf{Target Properties ($\mathcal{P}$-Comb)} \\
+% \midrule
+% \multirow{5}{*}{IND} 
+% & BPQ  & BBBP, PlogP, QED \\
+% & ELQ  & hERG, LIV, QED \\
+% & ACEP & AMP, CARC, hERG, PlogP \\
+% & BDPQ & BBBP, DRD2, PlogP, QED \\
+% & DHMQ & DRD2, hERG, MUT, QED \\
+% \cmidrule{1-3}
+% \multirow{5}{*}{OOD} 
+% & CDE   & CARC, DRD2, hERG \\
+% & ABMP  & AMP, BBBP, MUT, PlogP \\
+% & BCMQ  & BBBP, CARC, MUT, QED \\
+% & BDEQ  & BBBP, DRD2, hERG, QED \\
+% & HLMPQ & hERG, LIV, MUT, PlogP, QED \\
+% \bottomrule
+% \end{tabular}
+
+% \vspace{0.3cm} % 两个区块之间留出优雅的呼吸空间
+
+% % ================= 下半部：对称排版的参数表 =================
+% % 使用 @{\hspace{0.8cm}} 在左右两块中间强行撑开一点距离，视觉上更平衡
+% \begin{tabular}{@{}lcc@{\hspace{0.8cm}}lcc@{}}
+% \toprule
+% \textbf{Prop.} & $\Delta_p$ & $\Theta_p$ & \textbf{Prop.} & $\Delta_p$ & $\Theta_p$ \\
+% \midrule
+% AMP  & 0.1 & 0.8 & HIA   & 0.1 & 0.9 \\
+% BBBP & 0.1 & 0.8 & LIV   & 0.1 & 0.5 \\
+% CARC & 0.2 & 0.2 & MUT   & 0.1 & 0.2 \\
+% DRD2 & 0.1 & 0.4 & PlogP & 1.0 & 1.5 \\
+% hERG & 0.2 & 0.3 & QED   & 0.1 & 0.9 \\
+% \bottomrule
+% \end{tabular}
+
+% \caption{Overview of evaluation tasks and property thresholds. \textbf{(Top)} Target property combinations for both IND and OOD scenarios. \textbf{(Bottom)} The target improvement margins ($\Delta_p$) and near-optimal constraints ($\Theta_p$) for the 10 pharmacological properties. }
+% \label{tab:dataset_summary}
+% \end{table}
+
+% \subsection{Property Calculations}
+% To provide accurate property feedback during both the reinforcement learning phase and the final evaluation, we employ two established computational oracles. Specifically, we utilize the open-source cheminformatics toolkit RDKit \cite{landrum2013rdkit} to validate generated SMILES strings, extract Morgan fingerprints, and compute fundamental physicochemical properties such as QED and Penalized LogP. For the remaining complex properties, we leverage the ADMET-AI platform \cite{swanson2024admet} as our primary evaluator. These methods have been extensively validated and adopted in recent
+% studies \cite{averly-etal-2025-liddia, Zholus_Kuznetsov_Schutski_Shayakhmetov_Polykovskiy_Chandar_Zhavoronkov_2025, zheng2025large}.
+
+% \subsection{Implementation and Hyperparameters}
+% We use Low-Rank Adaptation (LoRA) \cite{hu2021loralowrankadaptationlarge} on the projection layers to fine-tune the policy models, rather than updating all parameters. The learning rate is set to $1 \times 10^{-6}$. Both GRPO and GDPO are trained with a batch size of 64 and a group size of 4. Policy updates are performed using 32 mini-batches over 2--3 optimization epochs per rollout.
+
+% To preserve valid SMILES syntax during training, we apply a Kullback--Leibler (KL) divergence penalty as a structural regularizer, with a target threshold of 1.0 and adaptive KL coefficients. Full implementation details are provided in Appendix \ref{appendix:implementation} (Table \ref{tab:hyperparams}), and the prompt template is given in Appendix \ref{appendix:prompt}.
+
+% \subsection{Baselines and Evaluation Metrics}
+
+% We compare our proposed \textsc{C-Moral} framework with two baseline models GeLLM\textsuperscript{4}O-C-P(10)-\text{Mistral} and GeLLM\textsuperscript{4}O-C-P(10)-\textsc{Llama}. For a fair and robust evaluation, all models generate candidate molecules using beam search with a beam width of 20. For each molecule, we select the best candidate according to Algorithm \ref{alg:beam_search}.
+
+% To comprehensively assess performance in highly constrained lead optimization, we employ four rigorous metrics: \textbf{(1) Success Optimized Rate (\textsc{Sor})}: the proportion of molecules that improve the targeted properties while maintaining other stability constraints; \textbf{(2) Strict Success Optimized Rate (\textsc{Ssor})}:  percentage of candidates that improve sub-optimal properties and strictly maintain near-optimal ones while preserving the core scaffold; \textbf{(3) Similarity (\textsc{Sim})}: the Tanimoto similarity over Morgan fingerprints between generated candidates and initial molecules; \textbf{(4) Relative Improvement (\textsc{Ri})}: the relative improvement across all sub-optimal properties. The detailed implementation is in Appendix \ref{appendix:metrics}. 
+\section{Experimental Setup}
+
+We evaluate the \textsc{C-Moral} framework (\textbf{C}ontrollable Multi-\textbf{O}bjective \textbf{M}olecular \textbf{O}ptimization with \textbf{R}einforcement \textbf{A}lignment for \textbf{L}LMs) on two molecule optimization benchmarks: C-MuMOInstruct \cite{dey2025large} and the MolOpt task from S$^2$-Bench \cite{li2025speaktostructureevaluatingllmsopendomain}. We conduct experiments on three base models: two open-weight LLMs, \textsc{LLaMA}-3.1-8B \cite{touvron2023llamaopenefficientfoundation} and \textsc{Mistral}-7B \cite{jiang2023mistral7b}, and a smaller domain-specialized LLM, \textsc{MolT5} \cite{edwards2022translationmoleculesnaturallanguage}.
+
+To isolate the effect of RL post-training, the LLM policies are initialized from the same SFT checkpoints provided by Dey et al., namely GeLLM$^4$O-C \cite{dey2025large}. For \textsc{MolT5}, we first perform supervised fine-tuning (SFT) on the molecular optimization dataset before applying RL post-training. The RL training is implemented using a custom training pipeline inspired by the design of the veRL framework \cite{Sheng_2025}.
+
+\subsection{Datasets and Tasks}
+Both benchmarks formulate molecular optimization as conditional molecule generation.
+
+For C-MuMOInstruct \cite{dey2025large}, we evaluate the model on 10 molecular optimization tasks and follow the predefined IND/OOD split summarized in Table~\ref{tab:dataset_summary}. 
+For OOD tasks, no paired optimized target molecules are available for the held-out property combinations. 
+We therefore perform label-free RL adaptation using 10K unlabeled source molecules sampled only from the IND training split, with rewards computed from task-specific property oracles. 
+The molecules in the OOD evaluation split are never used during SFT, RL adaptation, or model selection, ensuring that RL training molecules and final benchmark evaluation molecules are fully disjoint. 
+Details are provided in Appendix~\ref{appendix:dataset}.
+
+
+For the MolOpt task from S$^2$-Bench \cite{li2025speaktostructureevaluatingllmsopendomain}, we further evaluate the model on three goal-oriented molecular optimization subtasks: molecular refractivity (MR), quantitative estimation of drug-likeness (QED), and LogP optimization. Details of the training datasets are in Appendix~\ref{appendix:dataset}.
+
+
+
+\subsection{Property Calculations}
+
+To provide accurate property feedback during both the reinforcement learning phase and the final evaluation, we employ two established computational oracles. Specifically, we use the open-source cheminformatics toolkit RDKit \cite{landrum2013rdkit} to validate generated SMILES strings, extract Morgan fingerprints, and compute fundamental physicochemical properties such as QED and Penalized LogP. For the remaining complex pharmacological properties, we use the ADMET-AI platform \cite{swanson2024admet} as our primary evaluator. These tools have been widely validated and adopted in recent molecular optimization studies \cite{averly-etal-2025-liddia, Zholus_Kuznetsov_Schutski_Shayakhmetov_Polykovskiy_Chandar_Zhavoronkov_2025, zheng2025large}. 
+
+\subsection{Implementation and Hyperparameters}
+
+For large-scale models, we apply Low-Rank Adaptation (LoRA) \cite{hu2021loralowrankadaptationlarge} to the policy models instead of updating all parameters. The learning rate is set to $1 \times 10^{-6}$. Both GRPO and GDPO are trained with a batch size of 64 and a group size of 4. Policy updates are performed using 32 mini-batches over 2--3 optimization epochs per rollout. For MolT5, we use full fine-tuning for better adaptation. Detailed hyperparameters are provided in Tables~\ref{tab:llm-hyperparams} and~\ref{tab:molt5-hyperparams}. All RL post-training experiments are repeated with three random seeds. 
+
+
+\subsection{Baselines and Evaluation Metrics}
+
+For C-MuMOInstruct, we compare \textsc{C-Moral} with general-purpose LLMs, expert molecular generation models, and supervised fine-tuned molecular LLM baselines \cite{singh2026openaigpt5card, openai2024gpt4ocard, loeffler2024reinvent4, geminiteam2024gemini15unlockingmultimodal}. Following the standard benchmark protocol, all methods use the same 20-candidate generation budget and task-level selection rule, with details provided in Appendix~\ref{appendix:c-mumoinstruct}. For REINVENT-4, we perform task-specific staged training for each optimization setting and also generate 20 candidates at inference time. Therefore, all compared methods use the same candidate budget, property evaluators, and selection rule.
+
+We evaluate C-MuMOInstruct using four metrics. \textbf{Success Optimized Rate (\textsc{SOR})} measures whether the generated molecule improves the target properties while maintaining the required stability constraints. \textbf{Strict Success Optimized Rate (\textsc{SSOR})} further requires all relevant properties to reach their prescribed near-optimal criteria. \textbf{Similarity (\textsc{SIM})} is computed as the Tanimoto similarity between the generated and source molecules. \textbf{Relative Improvement (\textsc{RI})} measures the relative improvement over the sub-optimal properties. More details are provided in Appendix~\ref{appendix:c-mumoinstruct}.
+
+For S$^2$-Bench MolOpt, we follow the benchmark protocol and report property optimization performance with structural similarity in Appendix~\ref{appendix:s2bench}.
+
+
+\section{Results}
+\label{sec:results}
+
+We evaluate \textsc{C-Moral} on C-MuMOInstruct and S$^2$-Bench MolOpt. We first analyze the effect of reward design through ablations, then compare \textsc{C-Moral} with strong baselines on C-MuMOInstruct under both IND and OOD settings. Finally, we report results on S$^2$-Bench MolOpt to test generalization to another molecular optimization benchmark.
+
+
+% \subsection{Ablation Analysis}
+% % \YS{why we should report ablation analysis rather than main?}
+% To systematically validate the structural design of our continuous multi-objective reward formulation, we conducted an ablation study on the In-Domain (IND) task (Table \ref{tab:ablation_ind}) based on the \textsc{Mistral} model. We dissect the contributions of our two core mechanisms: Property Score Sigmoid Alignment and Non-linear Reward Aggregation.
+
+% \begin{table}[ht]
+% \centering
+% \caption{Ablation study on the IND task using \textsc{Mistral}. Non-linear aggregation prevents reward collapse (recovers Sim), while Sigmoid alignment maximizes overall success rates. Best and second-best results are bold and underlined.}
+% \label{tab:ablation_ind}
+% \footnotesize 
+% \setlength{\tabcolsep}{4pt} 
+% \renewcommand{\arraystretch}{1.2}
+% \resizebox{\columnwidth}{!}{
+% \begin{tabular}{@{} l cccc @{}}
+% \toprule
+% \multirow{2}{*}{Method} & \multicolumn{4}{c}{IND Task} \\
+% \cmidrule(l){2-5}
+%  & \textbf{SOR(\%)}$\uparrow$ & \textbf{SSOR(\%)}$\uparrow$ & \textbf{Sim}$\uparrow$ & \textbf{RI}$\uparrow$ \\
+% \midrule
+% GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.7 & 14.4 & \underline{0.58} & 51.4 \\
+% \midrule
+% GRPO w/ Linear AM & 24.2 & 11.2 & 0.35 & 21.5 \\
+% \quad + Geometric Mean & 39.7 & 17.1 & \underline{0.58} & \underline{108.4} \\
+% \quad \quad + Sigmoid Align & \textbf{48.9} & \textbf{25.1} & \textbf{0.59} & 96.1 \\
+% \midrule
+% GDPO w/ Linear AM & 9.5 & 4.5 & 0.28 & 12.3 \\
+% \quad + LogSum-Exp & 37.3 & 15.6 & 0.57 & 104.2 \\
+% \quad \quad  + Sigmoid Align & \underline{47.0} & \underline{25.0} & \textbf{0.59} & \textbf{110.4} \\
+% \bottomrule
+% \end{tabular}
+% }
+% \end{table}
+
+% \begin{figure*}[t] % [t] 表示尽量排在页面顶部，也可以用 [htbp]
+%     \centering
+%     % width=\textwidth 确保图片宽度刚好等于双栏的总宽度，不会超出版面
+%     \includegraphics[width=\textwidth]{figs/ablation_aggregation.pdf}
+%     \caption{Ablation study of reward aggregation on the HLMPQ task using \textsc{Mistral}-7B over 300 training steps. The results demonstrate that linear Arithmetic Mean (AM) methods suffer from varying degrees of reward collapse. In contrast, our non-linear approaches successfully maintain all property values within their safe boundaries.} 
+%     % \YS{what do orange lines mean?}}
+%     \label{fig:ablation_aggregation}
+% \end{figure*}
+
+% \paragraph{Vulnerability of Linear AM and Reward Collapse.}
+% The aggregation function critically affects how the policy balances multiple objectives. As shown in Table \ref{tab:ablation_ind}, linear Arithmetic Mean (AM) causes clear degradation relative to the SFT baseline for both GRPO and GDPO. Under GRPO, SOR drops from $33.7\% \to 24.2\%$ and Sim from $0.58 \to 0.35$. The effect is even more severe for GDPO, where SOR further falls to $9.5\%$ and Sim to $0.28$. These results suggest that linear scalarization tends to over-optimize a subset of easy objectives while sacrificing others, leading to unbalanced optimization and poor scaffold preservation. This trend is further supported by Figure \ref{fig:ablation_aggregation}, where AM-based training fails to keep all properties within their safe regions on the more challenging HLMPQ task.
+
+% \paragraph{Effectiveness of Non-Linear Reward Aggregation.}
+% Replacing AM with non-linear aggregation substantially improves optimization balance. Under GRPO, switching from linear AM to Geometric Mean improves SOR from $24.2\% \to 39.7\%$ (+64.0\% relative) and restores Sim from $0.35 \to 0.58$, while SSOR also increases from $11.2\% \to 17.1\%$. A similar trend is observed for GDPO: replacing AM with LogSum-Exp raises SOR from $9.5\% \to 37.3\%$ and Sim from $0.28 \to 0.57$, with SSOR improving from $4.5\% \to 15.6\%$. These recovered Sim values are close to the SFT baseline, indicating that non-linear aggregation effectively prevents the implicit sacrifice of scaffold fidelity. Figure \ref{fig:ablation_aggregation} further shows that these non-linear designs produce much more stable training trajectories across all properties. In contrast to the instability and reward collapse of GRPO and GDPO, the non-linear variants maintain smooth improvements and achieve stronger final performance.
+
+% \paragraph{Effectiveness of Property Score Sigmoid Alignment.}
+% Building upon non-linear aggregation, Property Score Sigmoid Alignment maps heterogeneous objectives into a unified $[0, 1]$ scale, directly addressing their inherent scale mismatch. The empirical gains are substantial: for GRPO, adding Sigmoid Align to Geometric Mean increases SOR from $39.7\% \to 48.9\%$ (+23.2\% relative). Crucially, it boosts the strict success rate (SSOR) from $17.1\% \to 25.1\%$, indicating finer control over all constraints simultaneously, while maintaining strong scaffold similarity ($0.58 \to 0.59$). For GDPO, adding it to LogSum-Exp improves SOR from $37.3\% \to 47.0\%$ and SSOR from $15.6\% \to 25.0\%$, with Sim slightly increasing ($0.57 \to 0.59$). These results suggest that, beyond preventing reward collapse, sigmoid alignment further improves optimization efficiency. By reducing scale mismatch, it prevents metrics with broader ranges from dominating and shifts learning toward the remaining property bottlenecks.
+\subsection{Ablation Analysis}
+
+To validate our reward design, we conduct an ablation study on the IND tasks using \textsc{Mistral}. We examine two key components: Non-linear Reward Aggregation and Property Score Sigmoid Alignment. Table \ref{tab:ablation_ind} reports the final performance, while Figure \ref{fig:ablation_aggregation} visualizes the training dynamics on the challenging HLMPQ task.
+
+\begin{table}[ht]
+\centering
+\caption{Ablation study on the IND task using \textsc{Mistral}. Non-linear aggregation prevents reward collapse and recovers molecular similarity, while Sigmoid alignment further improves overall and strict success rates. Best and second-best results are bold and underlined.}
+\label{tab:ablation_ind}
+\footnotesize 
+\setlength{\tabcolsep}{4pt} 
+\renewcommand{\arraystretch}{1.2}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{@{} l cccc @{}}
+\toprule
+\multirow{2}{*}{Method} & \multicolumn{4}{c}{IND Task} \\
+\cmidrule(l){2-5}
+ & \textbf{SOR(\%)}$\uparrow$ & \textbf{SSOR(\%)}$\uparrow$ & \textbf{Sim}$\uparrow$ & \textbf{RI}$\uparrow$ \\
+\midrule
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.7 & 14.4 & \underline{0.58} & 51.4 \\
+\midrule
+GRPO w/ Linear AM & 24.2 & 11.2 & 0.35 & 21.5 \\
+\quad + Geometric Mean & 39.7 & 17.1 & \underline{0.58} & \underline{108.4} \\
+\quad \quad + Sigmoid Align & \textbf{48.9} & \textbf{25.1} & \textbf{0.59} & 96.1 \\
+\midrule
+GDPO w/ Linear AM & 9.5 & 4.5 & 0.28 & 12.3 \\
+\quad + LogSum-Exp & 37.3 & 15.6 & 0.57 & 104.2 \\
+\quad \quad + Sigmoid Align & \underline{47.0} & \underline{25.0} & \textbf{0.59} & \textbf{110.4} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/ablation_aggregation.pdf}
+    \caption{Ablation study of reward aggregation on the HLMPQ task using \textsc{Mistral}-7B over 300 training steps. Linear Arithmetic Mean (AM) suffers from reward collapse, while our non-linear aggregation methods maintain property values within safe boundaries.}
+    \label{fig:ablation_aggregation}
+\end{figure*}
+
+\paragraph{Vulnerability of Linear AM and Reward Collapse.}
+Linear AM performs poorly for both GRPO and GDPO, showing that simple averaging is not sufficient for constrained multi-objective optimization. In Table \ref{tab:ablation_ind}, GRPO with Linear AM drops below the SFT baseline in both SOR ($33.7\% \to 24.2\%$) and Sim ($0.58 \to 0.35$), while GDPO with Linear AM collapses further to only $9.5\%$ SOR and $0.28$ Sim. This trend is further supported by Figure \ref{fig:ablation_aggregation}, where AM-based training fails to keep all properties within their safe regions on the more challenging HLMPQ task.
+
+\paragraph{Effectiveness of Non-Linear Reward Aggregation.}
+Non-linear aggregation is the main factor that prevents reward collapse. In Table \ref{tab:ablation_ind}, replacing Linear AM with Geometric Mean improves GRPO from $24.2\%$ to $39.7\%$ SOR and restores Sim from $0.35$ to $0.58$. Similarly, replacing Linear AM with LogSum-Exp improves GDPO from $9.5\%$ to $37.3\%$ SOR and restores Sim from $0.28$ to $0.57$. Consistent with these final scores, Figure \ref{fig:ablation_aggregation} shows that the non-linear variants maintain more stable property trajectories and avoid the boundary violations observed in AM-based training.
+
+\paragraph{Effectiveness of Property Score Sigmoid Alignment.}
+Sigmoid alignment is key to controllable optimization because it maps heterogeneous properties onto a shared scale. On top of non-linear aggregation, it increases GRPO from $39.7\%$ to \textbf{$48.9\%$} SOR and from $17.1\%$ to \textbf{$25.1\%$} SSOR. For GDPO, it improves SOR from $37.3\%$ to \underline{$47.0\%$} and SSOR from $15.6\%$ to \underline{$25.0\%$}. By reducing
+scale mismatch, it prevents metrics with broader ranges from dominating and shifts learning toward
+the remaining property bottlenecks.
+
+\paragraph{Group-Relative Policy Optimization vs. PPO.}
+We further compare the two group-relative methods with standard PPO. 
+On IND tasks, the group-relative variants of \textsc{C-MORAL} achieve a $+8.4$\% absolute improvement in SOR over standard PPO and converge approximately 3$\times$ faster, as shown in Table~\ref{tab:rl_algorithm_comparison} and Figure~\ref{fig:ppo}. 
+These results suggest that the value-network-based PPO objective is less effective under the complex and conflicting constraints of molecular editing. Detailed performance comparisons and training curves are provided in Appendix~\ref{appendix:ppo}.
+
+% \begin{table*}[t]
+% \centering
+% \small
+% \setlength{\tabcolsep}{5pt} 
+% \renewcommand{\arraystretch}{1.1}
+
+% \begin{tabular}{@{} l cccc cccc @{}}
+% \toprule
+% \multirow{2}{*}{\textbf{Model}} & \multicolumn{4}{c}{In-Domain (IND)} & \multicolumn{4}{c}{Out-of-Domain (OOD)} \\
+% \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+% & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ \\
+% \midrule
+
+% \rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{Supervised Fine-Tuning (SFT) Baselines}} \\
+% \quad GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.7 & 14.4 & \underline{0.58} & 51.4 & 24.4 & 9.8 & \textbf{0.60} & \textbf{27.3} \\
+% \quad GeLLM$^4$O-C$_{\mathrm{Llama}}$   & 30.2 & 13.7 & 0.56 & 61.3 & 25.2 & 10.2 & 0.57 & 6.5 \\
+% \midrule
+
+% \rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{RL Post-Training (Ours: \textsc{C-Moral})}} \\
+% \quad GRPO$_{\mathrm{Mistral}}$ & \textbf{48.9} & \underline{25.1} & \textbf{0.59} & 96.1 
+%                    & \textbf{39.5} & \textbf{20.8} & \textbf{0.60} & 19.5 \\
+% \quad GDPO$_{\mathrm{Mistral}}$ & \underline{47.0} & 25.0 & \textbf{0.59} & \textbf{110.4} & \underline{38.3} & \underline{19.8} & \underline{0.59} & \underline{27.2} \\
+% \quad GRPO$_{\mathrm{Llama}}$   & 40.3 & 20.1 & \underline{0.58} & 102.6 & 37.2 & 19.6 & \textbf{0.60} & 10.5 \\
+% \quad GDPO$_{\mathrm{Llama}}$   &  43.4   & \textbf{25.4}  &  0.57  &  \underline{110.3}  &    35.6  &   19.5   &  \underline{0.59}   &   19.1   \\
+% \bottomrule
+% \end{tabular}
+% \caption{Overall average performance across In-Domain (IND) and Out-of-Domain (OOD) tasks. \textsc{C-Moral} consistently improves Success Optimized Rate (SOR) and Strict Success Optimized Rate (SSOR) over strong SFT baselines while preserving scaffold similarity. Bold denotes the best result in each column, and underlined denotes the second-best.}
+% \label{tab:overall_summary}
+% \end{table*}
+
+% \begin{table*}[t]
+% \centering
+% \begin{minipage}[t]{0.65\textwidth}
+% \vspace{0pt}
+% \centering
+% (a)\par\vspace{2pt}
+% \small
+% \setlength{\tabcolsep}{4pt}
+% \renewcommand{\arraystretch}{1.1}
+% \resizebox{\textwidth}{!}{
+% \begin{tabular}{@{} l cccc cccc @{}}
+% \toprule
+% \multirow{2}{*}{\textbf{Model}} & \multicolumn{4}{c}{In-Domain (IND)} & \multicolumn{4}{c}{Out-of-Domain (OOD)} \\
+% \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+% & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ \\
+% \midrule
+
+% \rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+% Llama (0-shot) & 3.0 & 0.8 & \underline{0.62} & 8.0 & 2.0 & 0.5 & \underline{0.61} & 6.3 \\
+% Mistral (0-shot) & 2.6 & 0.5 & 0.61 & 7.0 & 1.1 & 0.3 & \underline{0.61} & 6.4 \\
+% Llama (1-shot) & 4.7 & 1.5 & \textbf{0.63} & 9.5 & 3.6 & 1.1 & 0.60 & 6.9 \\
+% Mistral (1-shot) & 5.8 & 2.3 & 0.61 & 9.3 & 4.3 & 1.4 & \textbf{0.62} & 9.2 \\
+% GPT-5o (1-shot) & 6.1 & 1.9 & \underline{0.62} & 9.8 & 5.6 & 2.3 & \underline{0.61} & 7.8 \\
+% GPT-5o (2-shot) & 7.8 & 2.9 & \underline{0.62} & 13.5 & 7.7 & 2.8 & 0.60 & 10.3 \\
+% \midrule
+
+% \rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{Expert Models \& SFT Baselines}} \\
+% REINVENT-4 & 3.5 & 1.3 & 0.59 & 9.2 & 2.3 & 0.5 & \underline{0.61} & 4.5 \\
+% MolT5-Large & 0.9 & 0.3 & \underline{0.62} & 10.9 & 0.5 & 0.1 & 0.63 & 3.9 \\
+% MolT5-Large (SFT) & 13.9 & 4.6 & \underline{0.62} & 20.3 & 10.6 & 3.6 & \textbf{0.62} & 5.8 \\
+% GeLLM$^4$O-C$_{\mathrm{Llama}}$   & 30.2 & 13.7 & 0.56 & 61.3 & 25.2 & 10.2 & 0.57 & 6.5 \\
+% GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 24.4 & 9.8 & 0.60 & \textbf{27.3} \\
+% \midrule
+
+% \rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{RL Post-Training (Ours: \textsc{C-Moral})}} \\
+% \multicolumn{9}{@{}l@{}}{\textbf{GRPO Method}} \\
+% \textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 7.9 & 0.61 & 25.4 & 19.2 & 7.7 & \underline{0.61} & 4.6 \\
+% \textsc{C-Moral}$_{\mathrm{Llama}}$ & 40.2 & 20.0 & 0.58 & 102.6 & 37.2 & 19.6 & 0.60 & 10.5 \\
+% \textsc{C-Moral}$_{\mathrm{Mistral}}$ & \textbf{48.9} & \underline{25.1} & 0.59 & 96.1 & \textbf{39.5} & \textbf{20.8} & 0.60 & 19.5 \\
+% \addlinespace[2pt]
+% \multicolumn{9}{@{}l@{}}{\textbf{GDPO Method}} \\
+% \textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 8.8 & 0.60 & 49.1 &  &  &  &  \\
+% \textsc{C-Moral}$_{\mathrm{Llama}}$ & 43.4 & \textbf{25.4} & 0.57 & \underline{110.3} & 35.6 & 19.5 & 0.59 & 19.1 \\
+% \textsc{C-Moral}$_{\mathrm{Mistral}}$ & \underline{47.0} & 24.9 & 0.59 & \textbf{110.4} & \underline{38.3} & \underline{19.8} & 0.59 & \underline{27.2} \\
+% \bottomrule
+% \end{tabular}
+% }
+
+
+% \end{minipage}
+% \hfill
+% \begin{minipage}[t]{0.34\textwidth}
+% \vspace{0pt}
+% \centering
+% (b)\par\vspace{2pt}
+% \includegraphics[width=\textwidth,height=0.35\textheight,keepaspectratio]{figs/result_bar.pdf}
+% \end{minipage}
+
+% \caption{Overall results on In-Domain (IND) and Out-of-Domain (OOD) tasks. (a) Average performance comparison between baselines and \textsc{C-Moral} variants in SOR, SSOR, similarity, and RI. (b) Relative improvements in SOR and SSOR over the baselines. Bold denotes the best result in each column, and underlined denotes the second-best.}
+% \label{tab:overall_summary}
+% \end{table*}
+\begin{table*}[t]
+\centering
+\begin{minipage}[t]{0.64\textwidth}
+\vspace{0pt}
+\centering
+(a)\par\vspace{2pt}
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{} l cccc cccc @{}}
+\toprule
+\multirow{2}{*}{\textbf{Model}} & \multicolumn{4}{c}{In-Domain (IND)} & \multicolumn{4}{c}{Out-of-Domain (OOD)} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+& \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ \\
+\midrule
+
+\rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+Llama (0-shot) & 3.0 & 0.8 & \textbf{0.66} & 8.0 & 2.0 & 0.5 & \textbf{0.67} & 6.3 \\
+Mistral (0-shot) & 2.6 & 0.5 & \textbf{0.66} & 7.0 & 1.1 & 0.3 & \textbf{0.67} & 6.4 \\
+Llama (1-shot) & 4.7 & 1.5 & \underline{0.63} & 9.5 & 3.6 & 1.1 & 0.60 & 6.9 \\
+Mistral (1-shot) & 5.8 & 2.3 & 0.61 & 9.3 & 4.3 & 1.4 & 0.62 & 9.2 \\
+GPT-5o (1-shot) & 6.1 & 1.9 & 0.62 & 9.8 & 5.6 & 2.3 & 0.61 & 7.8 \\
+GPT-5o (2-shot) & 7.8 & 2.9 & 0.62 & 13.5 & 7.7 & 2.8 & 0.60 & 10.3 \\
+\midrule
+
+\rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{Expert Models \& SFT Baselines}} \\
+REINVENT-4 & 3.5 & 1.3 & 0.59 & 9.2 & 2.3 & 0.5 & 0.61 & 4.5 \\
+MAMO (raw)
+\\
+MAMO (Adapted)
+\\
+MolT5-Large & 0.9 & 0.3 & 0.62 & 10.9 & 0.5 & 0.1 & \underline{0.63} & 3.9 \\
+MolT5-Large (SFT) & 13.9 & 4.6 & 0.62 & 20.3 & 10.6 & 3.6 & 0.62 & 5.8 \\
+GeLLM$^4$O-C$_{\mathrm{Llama}}$    & 30.2 & 13.7 & 0.56 & 61.3 & 25.2 & 10.2 & 0.57 & 6.5 \\
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 24.4 & 9.8 & 0.60 & \textbf{27.3} \\
+\midrule
+
+\rowcolor{gray!10}[0pt][0pt] \multicolumn{9}{@{}l@{}}{\textit{RL Post-Training (Ours: \textsc{C-Moral})}} \\
+\multicolumn{9}{@{}l@{}}{\textbf{GRPO Method}} \\
+\hspace{5pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 7.9 & 0.61 & 25.4 & 19.2 & 7.7 & 0.61 & 4.6 \\
+\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 40.2 & 20.0 & 0.58 & 102.6 & 37.2 & 19.6 & 0.60 & 10.5 \\
+\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \textbf{48.9} & \underline{25.1} & 0.59 & 96.1 & \textbf{39.5} & \textbf{20.8} & 0.60 & 19.5 \\
+\addlinespace[2pt]
+\multicolumn{9}{@{}l@{}}{\textbf{GDPO Method}} \\
+\hspace{5pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 8.8 & 0.60 & 49.1 & 16.8 & 6.4 & 0.60 & 5.2  \\
+\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 43.4 & \textbf{25.4} & 0.57 & \underline{110.3} & 35.6 & 19.5 & 0.59 & 19.1 \\
+\hspace{5pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \underline{47.0} & 24.9 & 0.59 & \textbf{110.4} & \underline{38.3} & \underline{19.8} & 0.59 & \underline{27.2} \\
+\bottomrule
+\end{tabular}
+}
+\end{minipage}
+\hfill
+% =========================================================
+% 右侧多图垂直堆叠排版区
+% =========================================================
+\begin{minipage}[t]{0.34\textwidth}
+\vspace{0pt}
+\centering
+% 上方图片：原有的柱状图 (b)
+(b)\par\vspace{2pt}
+\includegraphics[width=\textwidth,height=0.14\textheight,keepaspectratio]{figs/result_bar.pdf}
+
+\vspace{12pt} % 控制上下两张子图之间的垂直间距
+
+% 下方图片：新加入的雷达图 (c)
+(c)\par\vspace{2pt}
+\includegraphics[width=\textwidth,height=0.26\textheight,keepaspectratio]{figs/radar_mistral.pdf}
+\end{minipage}
+\caption{Overall multi-objective optimization results on C-MuMOInstruct. 
+(a) Comprehensive comparison of IND and OOD performance. For RL post-training methods, main-table results report the mean over three random seeds with beam search = 20; standard deviations are reported in Table~\ref{tab:rl_algorithm_comparison}.
+(b) Relative improvement margins in SOR and SSOR over the respective SFT baselines. 
+(c) Multi-dimensional capability trade-offs on the Mistral backbone.}
+\label{fig:c-mumo_benchmark}
+\end{table*}
+
+
+
+
+
+
+
+
+
+% \subsection{Comparison with Baselines}
+% \label{subsec:main_results}
+% We next evaluate our proposed \textsc{C-Moral} framework on \textsc{Mistral} and \textsc{Llama} architectures and compare it against strong SFT baselines (GeLLM$^4$O-C). Table \ref{tab:overall_summary} presents the overall average results on both In-Domain (IND) and Out-of-Domain (OOD) tasks, including both our GRPO and GDPO post-training variants. 
+
+% \paragraph{Performance on In-Domain (IND) Tasks.}
+% We first evaluate the models on the In-Domain tasks, where the target distributions are closer to those seen during training. As shown in Table \ref{tab:overall_summary}, the SFT baselines achieve SORs of 33.7\% and 30.2\% for \textsc{Mistral} and \textsc{Llama}, respectively. In contrast, RL post-training consistently yields large improvements. For \textsc{Mistral}, GRPO improves SOR from $33.7\% \to 48.9\%$ and SSOR from $14.4\% \to 25.1\%$, while maintaining high scaffold similarity ($0.58 \to 0.59$). GDPO achieves a comparable SOR of 47.0\% and a slightly higher RI of 110.4. Similar gains are also observed for \textsc{Llama}, where GRPO improves SOR from $30.2\% \to 40.3\%$ and SSOR from $13.7\% \to 20.1\%$, again without sacrificing scaffold similarity. These results show that \textsc{C-Moral} consistently improves multi-objective optimization performance within the in-domain setting. Detailed IND per-task results are provided in Table \ref{tab:ind_results}.
+
+% \paragraph{Generalization to Out-of-Domain (OOD) Tasks.}
+% We further evaluate the models on Out-of-Domain tasks to assess robustness beyond the in-domain distribution. As expected, the SFT baselines show clear performance drops under OOD prompts; for example, \textsc{Mistral} SOR decreases from 33.7\% on IND to 24.4\% on OOD. Despite this increased difficulty, our RL post-training variants remain substantially stronger than the corresponding SFT baselines. For \textsc{Mistral} base model, GRPO improves OOD SOR from $24.4\% \to 39.5\%$ (+61.9\% relative), while GDPO improves it from $24.4\% \to 38.3\%$ (+57.0\% relative). Notably, these gains are larger than those on IND, where GRPO and GDPO improve SOR from $33.7\% \to 48.9\%$ (+45.1\%) and from $33.7\% \to 47.0\%$ (+39.5\%). \textsc{Llama}-GRPO shows a similar trend, improving OOD SOR from $25.2\% \to 37.2\%$ and SSOR from $10.2\% \to 19.6\%$, while increasing Sim from 0.57 to 0.60. These results indicate that \textsc{C-Moral} yields strong relative improvements not only on IND tasks but also in more challenging OOD settings.
+% Detailed OOD per-task results are provided in Table \ref{tab:ood_results}.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% \begin{table*}[t]
+% \centering
+% \footnotesize % 顶会表格标准字号
+% \setlength{\tabcolsep}{0pt} % 设置为0，由 \fill 自动控制
+% \renewcommand{\arraystretch}{1.25}
+
+% \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l ccc ccc ccc ccc ccc @{}}
+% \toprule
+% \multirow{2}{*}{\textbf{Model}} & \multicolumn{3}{c}{\textsc{Bpq}} & \multicolumn{3}{c}{\textsc{Elq}} & \multicolumn{3}{c}{\textsc{Acep}} & \multicolumn{3}{c}{\textsc{Bdpq}} & \multicolumn{3}{c}{\textsc{Dhmq}} \\
+% \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+% & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ \\
+% \midrule
+
+% % ---------------- SFT 基线 ----------------
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{Supervised Fine-Tuning (SFT) Baselines}} \\
+% GeLLM$^4$O-C & 52.2 / 21.0 & 0.59 & 2.72 & 62.0 / 30.2 & 0.58 & 0.48 & 29.6 / 11.0 & 0.58 & \textbf{3.55} & 11.8 / 4.6 & 0.56 & 188.4 & 13.2 / 5.4 & 0.60 & 61.9 \\
+
+% % ---------------- C-MORAL ----------------
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{RL Post-Training (\textsc{C-Moral}, Ours)}} \\
+% \textbf{GRPO} & 65.7 / 36.4 & \textbf{0.60} & 3.22 & \textbf{73.4 / 38.8} & 0.58 & 0.51 & \textbf{42.4 / 20.8} & \textbf{0.59} & 3.54 & \textbf{24.8 / 11.6} & \textbf{0.58} & \textbf{238.2} & \textbf{38.2 / 18.0} & \textbf{0.62} & \textbf{234.9} \\
+% \textbf{GDPO} & \textbf{69.8 / 40.2} & 0.58 & \textbf{4.05} & 72.8 / 37.0 & 0.57 & \textbf{0.53} & - / - & - & - & - / - & - & - & - / - & - & - \\
+% \midrule
+
+% % ---------------- 优化后的底部汇总 (分两行) ----------------
+% \multicolumn{16}{c}{\textbf{Overall Average Performance (SFT $\rightarrow$ \textsc{C-Moral}})} \\
+% \multicolumn{16}{c}{\textbf{SR}: 33.7 $\rightarrow$ \textbf{48.9} \textcolor{blue}{(+15.2)} \quad \textbf{SSR}: 14.4 $\rightarrow$ \textbf{25.1} \textcolor{blue}{(+10.7)} \quad \textbf{Sim}: 0.58 $\rightarrow$ \textbf{0.59} \textcolor{blue}{(+0.01)}} \\
+% \bottomrule
+% \end{tabular*}
+
+% \caption{Detailed performance comparison on IND tasks using the \textsc{C-Moral} protocol. By decoupling the relative evaluation and applying non-linear reward shaping, our method achieves a nearly 19\% relative increase in strict success rate (SSR)[cite: 51, 238].}
+% \label{tab:ind_results_final}
+% \end{table*}
+
+
+
+% \subsection{Comparison with Baselines}
+% \label{subsec:main_results}
+
+% We next evaluate our proposed \textsc{C-Moral} framework on \textsc{Mistral} and \textsc{Llama} architectures and compare it against strong SFT baselines (GeLLM$^4$O-C). Table \ref{tab:overall_summary} presents the overall average results on both In-Domain (IND) and Out-of-Domain (OOD) tasks, including both our GRPO and GDPO post-training variants. 
+
+% \paragraph{Performance on In-Domain (IND) Tasks.}
+% On IND tasks, RL post-training consistently improves over the SFT baselines: (1) For \textsc{Mistral} base, GRPO improves SOR from $33.7\% \to 48.9\%$ (+45.1\%) and SSOR from $14.4\% \to 25.1\%$ (+74.3\%), while maintaining high similarity. GDPO achieves comparable SOR ($33.7\% \to 47.0\%$, +39.5\%) and SSOR ($14.4\% \to 25.0\%$, +73.6\%), while substantially improving RI ($51.4 \to 110.4$, +114.8\%); (2) For \textsc{Llama}, GRPO improves SOR from $30.2\% \to 40.3\%$ (+33.4\%) and SSOR from $13.7\% \to 20.1\%$ (+46.7\%), with Sim increasing from $0.56 \to 0.58$. GDPO further improves SOR to $43.4\%$ (+43.7\%) and SSOR to $25.4\%$ (+85.4\%), while raising RI from $61.3 \to 110.3$ (+79.9\%). Detailed IND results are provided in Table~\ref{tab:ind_results}. Overall, these results indicate that \textsc{C-Moral} consistently strengthens in-domain optimization performance, while GDPO shows a slight advantage on stricter metrics and RI.
+
+% \paragraph{Generalization to Out-of-Domain (OOD) Tasks.}
+% OOD tasks are more challenging for all models, and the SFT baselines show clear drops from IND to OOD. RL post-training remains consistently effective. For \textsc{Mistral}, GRPO improves OOD SOR from $24.4\% \to 39.5\%$ (+61.9\%) and SSOR from $9.8\% \to 20.8\%$ (+112.2\%), while keeping Sim unchanged at 0.60. GDPO also performs strongly, improving SOR from $24.4\% \to 38.3\%$ (+57.0\%) and SSOR from $9.8\% \to 19.8\%$ (+102.0\%). For \textsc{Llama}, GRPO improves SOR from $25.2\% \to 37.2\%$ (+47.6\%) and SSOR from $10.2\% \to 19.6\%$ (+92.2\%), while increasing Sim from $0.57 \to 0.60$. GDPO improves SOR from $25.2\% \to 35.6\%$ (+41.3\%), SSOR from $10.2\% \to 19.5\%$ (+91.2\%), and RI from $6.5 \to 19.1$ (+193.8\%). Detailed OOD results are provided in Table~\ref{tab:ood_results}.
+
+% \paragraph{Similarity Comparison.}
+% Both RL variants generally improve similarity over the corresponding SFT baselines. On IND tasks, \textsc{Mistral} improves from $0.58 \to 0.59$, while \textsc{Llama}-GRPO improves from $0.56\to0.58$. On OOD tasks, \textsc{Mistral} remains at 0.59\textasciitilde0.60, and \textsc{Llama} improves from $0.57 \to 0.60$ with GRPO and to 0.59 with GDPO. The average similarity still does not always reach our target of 0.60, partly because beam search (\texttt{num\_beam}) favors better-scoring candidates at the cost of slightly larger structural edits.
+
+% \paragraph{Overall observations.}
+% Overall, \textsc{C-Moral} consistently outperforms the SFT baselines across both backbones and both settings. The best IND SOR improves from $33.7\%/30.2\%$ to $48.9\%/43.4\%$ for \textsc{Mistral}/\textsc{Llama}, corresponding to relative gains of +45.1\% and +43.7\%, respectively; the best IND SSOR improves from $14.4\%/13.7\%$ to $25.1\%/25.4\%$, yielding +74.3\% and +85.4\% relative improvements. On OOD tasks, the best SOR improves from $24.4\%/25.2\%$ to $39.5\%/37.2\%$ (+61.9\% / +47.6\%), and the best SSOR improves from $9.8\%/10.2\%$ to $20.8\%/19.6\%$ (+112.2\% / +92.2\%). These gains are achieved w  hile largely preserving scaffold similarity, indicating that the improvements come from better optimization rather than structural drift.
+\subsection{Results on C-MuMOInstruct}
+\label{subsec:main_results}
+
+We evaluate \textsc{C-Moral} on C-MuMOInstruct across three backbones: \textsc{Mistral}, \textsc{Llama}, and \textsc{MolT5}. As shown in Table~\ref{fig:c-mumo_benchmark}(a), our framework consistently improves controllable multi-objective molecular optimization across different LLMs. Detailed per-task results are reported in Appendix~\ref{appendix:complete_exp_results}.
+
+\paragraph{State-of-the-Art IND Performance.}
+On IND tasks, \textsc{C-Moral} outperforms all compared methods in controllable molecular optimization. As shown in Table~\ref{fig:c-mumo_benchmark}(a), it obtains the best SOR of \textbf{$48.9\%$} with \textsc{C-Moral}$_{\mathrm{Mistral}}$ and the best SSOR of \textbf{$25.4\%$} with \textsc{C-Moral}$_{\mathrm{Llama}}$. These gains indicate that our RL framework better satisfies target property improvement and preservation constraints simultaneously. Meanwhile, \textsc{C-Moral} maintains competitive similarity around $0.59$--$0.61$ and strong molecular quality in validity, novelty, and synthetic accessibility, as detailed in Table~\ref{tab:ind_detailed_results}(b), suggesting that the improvements are not primarily driven by structural drift or degenerate oracle-gaming artifacts. The radar visualization in Table~\ref{fig:c-mumo_benchmark}(c) further supports this balanced improvement.
+
+\paragraph{Adaptation to Unseen Objective Combinations.}
+The OOD setting evaluates label-free adaptation to held-out objective combinations. As shown in Table~\ref{fig:c-mumo_benchmark}(b), GRPO achieves the strongest OOD gains on both LLM backbones. For \textsc{Mistral}, it improves SOR from $24.4\%$ to \textbf{$39.5\%$} ($+61.9\%$) and SSOR from $9.8\%$ to \textbf{$20.8\%$} ($+112.2\%$). For \textsc{Llama}, it improves SOR from $25.2\%$ to \textbf{$37.2\%$} ($+47.6\%$) and SSOR from $10.2\%$ to \textbf{$19.6\%$} ($+92.2\%$). GDPO also remains highly competitive, reaching $38.3\%/19.8\%$ SOR/SSOR on \textsc{Mistral} and $35.6\%/19.5\%$ on \textsc{Llama}. These consistent OOD improvements, together with the molecular quality metrics in Table~\ref{tab:ood_detailed_results}(b), suggest that \textsc{C-Moral} adapts to unseen property combinations while maintaining valid, novel, and synthetically reasonable molecules.
+
+\paragraph{General Applicability across Model Scales.}
+\textsc{C-Moral} also improves the smaller molecule-text model \textsc{MolT5}. Compared with \textsc{MolT5}-Large (SFT), RL post-training increases IND SOR/SSOR from $13.9\%/4.6\%$ to $20.0\%/8.8\%$, and OOD SOR/SSOR from $10.6\%/3.6\%$ to $19.2\%/7.7\%$, while maintaining similarity around $0.60$--$0.61$. Together with the stronger absolute performance of 7B/8B LLMs in Table~\ref{fig:c-mumo_benchmark}(a), these results show that \textsc{C-Moral} generalizes across model scales while model capacity remains important for complex controllable molecular editing.
+
+\paragraph{GRPO vs. GDPO.}
+GRPO and GDPO show complementary empirical strengths. GRPO achieves the best OOD SOR/SSOR on both \textsc{Mistral} ($39.5\%/20.8\%$) and \textsc{Llama} ($37.2\%/19.6\%$), suggesting that it is more favorable for strict success optimization under held-out objective combinations. In contrast, GDPO often achieves higher RI while maintaining comparable similarity, reaching RI of $110.4$ on \textsc{Mistral} IND and $110.3$ on \textsc{Llama} IND. These results indicate that GRPO better supports constraint satisfaction, whereas GDPO is more beneficial for property improvement.
+
+\subsection{Results on S$^2$-Bench MolOpt}
+
+We further evaluate \textsc{C-Moral} on S$^2$-Bench MolOpt, which considers both property improvement and structural similarity. As shown in Table~\ref{tab:molopt_results}, \textsc{C-Moral} achieves the strongest overall performance across LogP, MR, and QED, consistently improving WSR over the corresponding GeLLM$^4$O-C backbones. For example, on LogP, WSR improves from $0.6554/0.6637$ to $0.6756/0.6951$ on the Mistral and LLaMA backbones, respectively. On MR, \textsc{C-Moral}$_{\text{Mistral}}$ achieves the best WSR of $0.8126$, with high SR ($0.9546$) and similarity ($0.8513$). These results show that \textsc{C-Moral} generalizes beyond C-MuMOInstruct to standard goal-oriented molecular optimization.
+
+
+
+
+
+
+
+% \section{Conclusion}
+% We introduced \textsc{C-Moral}, a reinforcement learning post-training framework for controllable multi-objective molecular optimization. The proposed framework is built on three key contributions: (1) group-based relative optimization, instantiated through memory-efficient GRPO and GDPO variants, to support stable policy learning under diverse optimization dynamics; (2) property score sigmoid alignment for handling heterogeneous objective scales and enabling fine-grained controllability; and (3) continuous non-linear reward aggregation, which enforces balanced multi-objective trade-offs and effectively prevents reward collapse.
+
+% Empirical results on the C-MuMO benchmark demonstrate that \textsc{C-Moral} substantially improves both success rate and strict success rate over strong SFT baselines while maintaining scaffold similarity. Furthermore, these performance improvements seamlessly extend from in-domain tasks to significantly more challenging out-of-domain settings. This robust generalization capability suggests that our RL post-training approach effectively navigates unseen chemical spaces under distribution shifts. Ultimately, \textsc{C-Moral} highlights the promising potential of aligning language models with complex pharmacological objectives, offering a scalable and reliable tool to optimize molecules.
+\section{Conclusion}
+
+We introduced \textsc{C-Moral}, a constraint-aware RL post-training framework for controllable multi-objective molecular optimization with LLMs. The framework combines group-relative optimization with sigmoid-based property score alignment and bottleneck-sensitive non-linear reward aggregation. This design allows molecular LLMs to handle heterogeneous property scales, reduce reward dominance, and better satisfy competing improvement, stability, and scaffold-preservation constraints.
+
+Empirical results on C-MuMOInstruct show that \textsc{C-Moral} substantially improves both SOR and SSOR over strong SFT baselines across in-domain and out-of-domain settings, while maintaining competitive scaffold similarity. Ablation studies further demonstrate that non-linear aggregation prevents reward collapse and that sigmoid alignment improves controllability under heterogeneous molecular objectives. Results on S$^2$-Bench MolOpt also show consistent gains on standard goal-oriented optimization tasks, indicating that the proposed RL alignment strategy is not limited to the C-MuMO setting. Overall, \textsc{C-Moral} highlights the potential of RL post-training as a general alignment paradigm for molecular LLMs, and suggests future opportunities to combine constraint-aware rewards with reasoning-enhanced molecular editing.
+
+
+
+
+\section*{Limitations}
+
+Although \textsc{C-Moral} shows strong performance on C-MuMOInstruct and S$^2$-Bench MolOpt, our study has several limitations. First, our experiments are conducted on existing molecular optimization benchmarks. While these benchmarks cover both controllable multi-objective optimization and standard MolOpt tasks, real-world drug discovery may involve additional constraints such as synthetic accessibility, target-specific binding affinity, and experimental validation. Second, due to computational resource constraints, we mainly evaluate two instruction-following LLM backbones, \textsc{Mistral} and \textsc{Llama}, together with the smaller molecule-text model \textsc{MolT5}. Exploring substantially larger LLMs and more molecular foundation models remains future work. Third, our reward and evaluation signals rely on computational property oracles, which are widely used but may not perfectly reflect experimental molecular properties. Future work can further improve oracle reliability and explore reasoning-enhanced molecular optimization, where LLMs explicitly reason about property trade-offs and editing strategies before generating optimized molecules.
+
+\section*{Ethics Statement}
+
+\textsc{C-Moral} is an in silico framework for controllable molecular optimization. All experiments are conducted on standard molecular optimization benchmarks, and generated molecules are evaluated only through computational property oracles. As with other molecular generation methods, the model may carry potential dual-use risks if misused to design harmful compounds. We emphasize that generated molecules should be treated as computational hypotheses and require expert review, safety assessment, and laboratory validation before any real-world application. AI assistants were used to support language polishing, LaTeX formatting, and coding.  All outputs were reviewed and verified by the authors.
+
+
+
+
+
+
+
+
+
+
+
+
+% Bibliography entries for the entire Anthology, followed by custom entries
+%\bibliography{anthology,custom}
+% Custom bibliography entries only
+\clearpage
+\bibliography{custom}
+
+\clearpage
+\appendix
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+
+\section{Details on Reward Aggregation}
+\label{sec:appendix}
+
+
+In multi-objective molecular optimization, the choice of reward aggregation directly determines the alignment behavior of the RL agent. We deliberately avoid standard linear scalarization in favor of non-linear aggregation methods, such as the Geometric Mean (GM) or the Smooth Minimum (-Log-Sum-Exp). 
+
+\subsection{Reward Aggregation}
+\label{appendix:aggregation}
+The standard Arithmetic Mean (AM) defines the total reward as a linear combination of individual objectives: $R_{AM} = \frac{1}{N} \sum_{i=1}^N r_i$. While mathematically simple, it exhibits severe limitations when navigating complex chemical spaces. 
+
+As illustrated in Figure~\ref{fig:pareto_front}(a), the level curves of AM are straight lines. In molecular optimization, the true Pareto front between competing pharmacological properties (e.g., binding affinity versus drug-likeness) is typically strictly concave. Optimizing a linear objective over a concave front inevitably drives the solution toward the extremes (corner solutions). This mathematical artifact is the root cause of the "implicit sacrifice" phenomenon, where the LLM maximizes one easily optimizable property by completely violating another.
+
+In contrast, Figure~\ref{fig:pareto_front}(b) demonstrates the behavior of the Geometric Mean: 
+\[
+R_{GM} = \left( \prod_{i=1}^N r_i \right)^{\frac{1}{N}}. 
+\]
+The GM constructs strictly convex, hyperbolic level sets. When these level sets intersect with the concave Pareto front, the optimal solution naturally settles near the center. This geometry enforces balanced trade-offs, effectively acting as a differentiable logical "AND" operator that requires all constraints to be reasonably satisfied.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figs/pareto_front.png}
+  \caption{Optimal solutions on a concave Pareto front. (a) Arithmetic Mean leads to extreme boundary solutions. (b) Geometric Mean forces balanced trade-offs.}
+  \label{fig:pareto_front}
+\end{figure}
+
+
+
+\subsection{Reward Aggregation: GRPO \& GDPO}
+\label{appendix:gm_vs_logmin}
+
+To enforce the simultaneous satisfaction of all constraints, the aggregation function must approximate the logical AND ($\min$) operator. While both Geometric Mean (GM) and -Log-Sum-Exp (LogMin) provide continuous gradients, their mathematical properties dictate their specific applications in GRPO and GDPO.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figs/contour.png}
+  \caption{Contour plots of aggregation functions on two-dimensional objectives. (a) Geometric Mean (b) LogMin}
+  \label{fig:contour}
+\end{figure}
+
+As shown in Figure \ref{fig:contour}, GM and LogMin exhibit fundamentally different gradient behaviors. 
+
+For GM, defined as $R_{GM} = (\prod_{i=1}^N r_i)^{\frac{1}{N}}$, the gradient with respect to a single objective $r_j$ is:
+$$ \frac{\partial R_{GM}}{\partial r_j} = \frac{1}{N} \frac{R_{GM}}{r_j} $$
+This multiplicative nature ensures that the optimization of $r_j$ is holistically scaled by the performance of all other objectives.
+
+Conversely, LogMin acts as a strict bottleneck. Defined as $R_{LSE} = -\frac{1}{k} \log \sum_{i=1}^N \exp(-k \cdot x_i)$, its gradient is exactly the softmax distribution:
+$$ \frac{\partial R_{LSE}}{\partial x_j} = \frac{\exp(-k \cdot x_j)}{\sum_{i=1}^N \exp(-k \cdot x_i)} $$
+When $k$ is sufficiently large, if $x_j$ is the worst-performing objective, its exponential term dominates the denominator. Consequently, $\frac{\partial R_{LSE}}{\partial x_j} \to 1$, while gradients for all other objectives approach $0$. This mathematically explains the "L-shaped" contours in Figure \ref{fig:contour}(b), proving that LogMin forces the model to exclusively penalize the weakest property.
+
+\paragraph{Domain Constraints}
+Beyond gradients, the mathematical domain strictly determines algorithmic compatibility:
+\begin{itemize}
+    \item \textbf{GRPO ($r_i \in [0, 1]$):} GRPO maps raw properties to positive scores via non-linear reward shaping, perfectly satisfying the strict non-negativity requirement of the GM function.
+    \item \textbf{GDPO ($A_i \in \mathbb{R}$):} GDPO optimizes pairwise advantages, which naturally span negative values. Since GM is undefined for negative numbers, LogMin becomes mathematically mandatory. It seamlessly aggregates unbounded real numbers, isolating the most critical negative margin without breaking domain constraints.
+\end{itemize}
+
+
+
+\begin{figure*}[t] 
+  \centering
+  \includegraphics[width=\textwidth]{figs/prompt.png} 
+  \caption{An example of the highly structured prompt template used in \textsc{C-Moral}. The prompt dynamically integrates the source molecule (Input) with explicit optimization directions and numerical thresholds (Adjustments) to guide the language model during the RL phase.}
+  \label{fig:prompt}
+\end{figure*}
+
+
+
+\section{Details on Dataset}
+\label{appendix:dataset}
+
+We provide additional details on the dataset usage and sampling protocol for reinforcement learning. Our experiments involve two molecule optimization benchmarks, C-MuMOInstruct and the MolOpt task from S$^2$-Bench. Both benchmarks are formulated as conditional molecular optimization, where each example contains a source molecule and an optimization instruction, and the model is expected to generate an optimized molecule satisfying the specified objective.
+
+For C-MuMOInstruct, the In-Domain (IND) tasks provide paired training examples for each optimization task, where each pair consists of a source molecule and a corresponding target molecule satisfying the desired property constraints. Depending on the task, the number of available training pairs ranges from approximately 20K to 100K. In our reinforcement learning stage, instead of using the full training set, we randomly sample 10K source molecules from each IND task for RL training. To reduce the effect of sampling variance and provide a more robust evaluation, we repeat this sampling procedure with three different random seeds.
+
+For the Out-of-Domain (OOD) tasks, no paired target molecules or supervised labels are available for the held-out property combinations. We therefore do not train on any ground-truth optimized OOD pairs. Instead, we perform label-free RL adaptation using 10K unlabeled source molecules sampled from the IND molecular pool. These molecules are reused only as starting points, while the optimization objectives are changed to the OOD property combinations. Rewards are computed directly from the generated molecules using task-specific property oracles and constraints, without using any target molecules.
+
+For S$^2$-Bench, we use the training split of the MolOpt task, which evaluates goal-oriented molecular optimization over three property objectives: LogP, molecular refractivity (MR), and quantitative estimation of drug-likeness (QED). Consistent with our C-MuMOInstruct setting, we sample 10K molecules from the MolOpt training set for RL training. This ensures that all RL experiments are conducted under a comparable data budget across benchmarks.
+
+
+\section{Details on Implementation}
+\label{appendix:implementation}
+\subsection{Hyperparameters}
+\label{appendix:hyperparams}
+
+\begin{table}[!htbp]
+\centering
+\small
+% 核心修复：限制表格最大宽度为单栏宽度 (\columnwidth)
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{ll}
+\toprule
+\textbf{Hyperparameter} & \textbf{Value} \\
+\midrule
+Base Model & [Mistral-7B-v0.3, Llama3.1-8B] \\
+Optimizer & AdamW ($\beta_1=0.9, \beta_2=0.95$) \\
+Learning Rate & $1 \times 10^{-6}$ \\
+Learning Rate Scheduler & Cosine with 10\% warmup \\
+LoRA Rank ($r$) & 16 \\
+LoRA Alpha ($\alpha$) & 32 \\
+Target Modules & \makecell[l]{q\_proj, v\_proj, k\_proj, o\_proj,\\ gate, up, down\_proj, lm\_head} \\
+Max Sequence Length & 100 tokens \\
+Temperature & 1.0 \\
+\midrule
+RL Algorithm & GRPO/GDPO \\
+Group Size ($G$) & 4 \\
+KL Coefficient (Initial) & 0.05 \\
+KL Target Value & 1.0 \\
+Rollout Batch Size & 32 \\
+Optimization Epochs & 2 \\
+MiniBatch Size & 32 \\
+Training Size & 10000 mols per task \\ 
+\midrule
+Hardware & 1 $\times$ NVIDIA A100 (80GB) \\
+Training Time & $\sim$6 Hours per task \\
+\bottomrule
+\end{tabular}
+} % 结束 resizebox
+\caption{Hyperparameters for Mistral and Llama RL post-training stages.}
+\label{tab:llm-hyperparams}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+% 核心修复：限制表格最大宽度为单栏宽度 (\columnwidth)
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{ll}
+\toprule
+\textbf{Hyperparameter} & \textbf{Value} \\
+\midrule
+\multicolumn{2}{l}{\textbf{Shared Settings}} \\
+\midrule
+Base Model & MolT5 \\
+Training Method & Full-parameter fine-tuning \\
+Optimizer & AdamW ($\beta_1=0.9, \beta_2=0.95$) \\
+Learning Rate Scheduler & Cosine with 10\% warmup \\
+Max Sequence Length & 100 tokens \\
+Temperature & 1.0 \\
+Training Size & 10,000 molecules per task \\
+Hardware & 1 $\times$ NVIDIA A100 (80GB) \\
+\midrule
+\multicolumn{2}{l}{\textbf{SFT Settings}} \\
+\midrule
+SFT Learning Rate & $1 \times 10^{-4}$ \\
+SFT Batch Size & 128 \\
+SFT Epochs & 10 \\
+\midrule
+\multicolumn{2}{l}{\textbf{RL Settings}} \\
+\midrule
+RL Algorithm & GRPO/GDPO \\
+GRPO/GDPO Learning Rate & $5 \times 10^{-5}$ \\
+Group Size ($G$) & 4 \\
+KL Coefficient (Initial) & 0.05 \\
+KL Target Value & 1.0 \\
+Rollout Batch Size & 32 \\
+Optimization Epochs & 2 \\
+MiniBatch Size & 32 \\
+\midrule
+Hardware & 1 $\times$ NVIDIA A100 (80GB) \\
+Training Time & $\sim$3 Hours per task \\
+\bottomrule
+\end{tabular}
+} % 结束 resizebox
+\caption{Hyperparameters for full-parameter SFT and RL post-training of MolT5.}
+\label{tab:molt5-hyperparams}
+\end{table}
+
+\begin{table*}[!htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{} l cccc cccc cccc @{}}
+\toprule
+\multirow{2}{*}{\textbf{Model}} 
+& \multicolumn{4}{c}{\textbf{LogP}} 
+& \multicolumn{4}{c}{\textbf{MR}} 
+& \multicolumn{4}{c}{\textbf{QED}} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9} \cmidrule(lr){10-13}
+& \textbf{SR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{WSR}$^{\uparrow}$ & \textbf{Validity}$^{\uparrow}$
+& \textbf{SR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{WSR}$^{\uparrow}$ & \textbf{Validity}$^{\uparrow}$
+& \textbf{SR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{WSR}$^{\uparrow}$ & \textbf{Validity}$^{\uparrow}$ \\
+\midrule
+GPT-4o 
+& 0.7190 & 0.6586 & 0.4735 & 0.8796
+& 0.6864 & 0.6420 & 0.4407 & 0.8352
+& 0.3952 & 0.6180 & 0.2442 & 0.8570 \\
+
+Gemini-1.5-pro
+& 0.7712 & 0.7022 & 0.5415 & 0.9274
+& 0.7876 & 0.6744 & 0.5312 & 0.8926
+& 0.4704 & 0.6077 & 0.2859 & 0.9484 \\
+
+Mistral-7B-Instruct-v0.2
+& 0.2220 & 0.4501 & 0.0999 & 0.2802
+& 0.1908 & 0.2578 & 0.0492 & 0.3795
+& 0.1210 & 0.3244 & 0.0393 & 0.2532 \\
+
+Llama3-70B-Instruct (Int4)
+& 0.5984 & 0.6028 & 0.3607 & 0.6482
+& 0.5684 & 0.6032 & 0.3429 & 0.6272
+& 0.2774 & 0.4828 & 0.1339 & 0.6340 \\
+\midrule
+MolT5-base
+& 0.2074 & 0.1051 & 0.0218 & 0.4168
+& 0.1856 & 0.1073 & 0.0199 & 0.3796
+& 0.2358 & 0.1054 & 0.0249 & 0.4536 \\
+
+MolT5-large
+& 0.4244 & 0.1015 & 0.0431 & 0.8156
+& 0.4496 & 0.1072 & 0.0482 & 0.8678
+& 0.4654 & 0.1190 & 0.0554 & 0.9214 \\
+\midrule
+Llama3.1-8B (OpenMolIns-large)
+& 0.8054 & 0.6678 & 0.5378 & 0.8720
+& 0.7122 & 0.6548 & 0.4663 & 0.8514
+& 0.5224 & 0.6398 & 0.3342 & 0.8802 \\
+
+Llama3.1-8B (OpenMolIns-xlarge)
+& 0.8822 & 0.6662 & 0.5877 & 0.9314
+& 0.6982 & 0.6693 & 0.4673 & 0.9422
+& 0.8648 & 0.6736 & 0.5825 & 0.9310 \\
+
+Galactica-125M (OpenMolIns-xlarge)
+& 0.7362 & 0.5744 & 0.4229 & 0.8902
+& 0.7124 & 0.5697 & 0.4059 & 0.8612
+& 0.5786 & 0.5677 & 0.3285 & 0.8626 \\
+\midrule
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$
+& 0.9010 & 0.7515 & 0.6554 & \textbf{0.9998}
+& \underline{0.9420} & 0.7481 & 0.7047 & \underline{0.9996}
+& 0.8760 & \underline{0.7482} & \underline{0.6770} & 0.9998 \\
+
+GeLLM$^4$O-C$_{\mathrm{LLaMA}}$
+& 0.8936 & 0.7427 & 0.6637 & \underline{0.9996}
+& 0.9152 & 0.7539 & 0.6900 & 0.9994
+& 0.8832 & 0.7189 & 0.6350 & 0.9994 \\
+\midrule
+\textsc{C-Moral}$_{\mathrm{Mistral}}$
+& \textbf{0.9650} & \textbf{0.8016} & \underline{0.6756} & 0.9996
+& \textbf{0.9546} & \textbf{0.8513} & \textbf{0.8126} & \textbf{0.9998}
+& \underline{0.9010} & \textbf{0.7498} & \textbf{0.7735} & \textbf{1.0000} \\
+
+\textsc{C-Moral}$_{\mathrm{LLaMA}}$
+& \underline{0.9215} & \underline{0.7541} & \textbf{0.6951} & \textbf{0.9998}
+& 0.9372 & \underline{0.7864} & \underline{0.7370} & 0.9995
+& \textbf{0.9106} & 0.7164 & 0.6523 & \underline{0.9999} \\
+\bottomrule
+\end{tabular}
+}
+\caption{Performance comparison on the MolOpt task from S$^2$-Bench. Baseline results above are directly reported from the original benchmark paper, while GeLLM$^4$O-C and \textsc{C-Moral} are evaluated using the same MolOpt protocol. WSR is computed as SR $\times$ Sim. Best results are bolded and second-best results are underlined.}
+\label{tab:molopt_results}
+\end{table*}
+
+
+\begin{algorithm*}[t]
+\caption{Candidate Selection}
+\label{alg:beam_search}
+\begin{algorithmic}[1]
+\Require Source molecule $M_{src}$, trained policy $\pi_\Theta$, beam size $K=20$
+\Require Target properties $\mathcal{P}$, near-optimal thresholds $\Theta_p$ for $p \in \mathcal{P}$
+\Require Optimization directions $d_p \in \{1, -1\}$ for $p \in \mathcal{P}$ \Comment{$1$: Maximize, $-1$: Minimize}
+\Require Target improvement margins $\Delta_p$, and stability tolerance margins $\Delta_q$
+\Ensure The best aligned candidate $M_{best}$
+
+\State \textbf{Step 1:} \textit{Evaluate source molecule and dynamically formulate optimization tasks}
+\State $\mathcal{P}_{sub} \leftarrow \{ p \in \mathcal{P} \mid d_p \cdot p(M_{src}) < d_p \cdot \Theta_p \}$ \Comment{Identify sub-optimal properties}
+\State $\mathcal{P}_{con} \leftarrow \{ q \in \mathcal{P} \mid d_p \cdot q(M_{src}) \ge d_p \cdot \Theta_q \}$ \Comment{Identify near-optimal properties}
+\State
+
+\State \textbf{Step 2:} \textit{Generate candidates conditioned on the formulated tasks}
+\State $\mathcal{M}_{gen} \leftarrow \text{BeamSearch}(\pi_\Theta(\cdot \mid M_{src}), K)$ 
+\State
+
+\State \textbf{Step 3:} \textit{Filter candidates to construct the SOR-compliant set $\mathcal{C}_{SOR}$}
+\State $\mathcal{C}_{SOR} \leftarrow \left\{ c \in \mathcal{M}_{gen} \ \middle| \ 
+    \begin{array}{l}
+        \forall p \in \mathcal{P}_{sub}: d_p \cdot (p(c) - p(M_{src})) \ge \Delta_p \ \land \\
+        \forall q \in \mathcal{P}_{con}: |q(c) - q(M_{src})| \le \Delta_q
+    \end{array}
+\right\}$
+\State
+
+\State \textbf{Step 4:} \textit{Select the optimal candidate based on Relative Improvement (RI)}
+\If{$\mathcal{C}_{SOR} \neq \emptyset$}
+    \State $M_{best} \leftarrow \underset{c \in \mathcal{C}_{SOR}}{\arg\max} \ \text{RI}(c, M_{src})$
+\Else
+    \State $M_{best} \leftarrow \underset{c \in \mathcal{M}_{gen}}{\arg\max} \ \text{RI}(c, M_{src})$ \Comment{Fallback: maximum RI relaxation}
+\EndIf
+
+\State \Return $M_{best}$
+\end{algorithmic}
+\end{algorithm*}
+
+
+
+
+\subsection{Prompt Design}
+\label{appendix:prompt}
+
+We use structured prompt templates to help the language model interpret multi-objective molecular optimization tasks, as shown in Figures~\ref{fig:prompt} and~\ref{fig:prompt_llm}. 
+For \textsc{C-Moral}, the prompt is dynamically assembled for each episode: the \texttt{Input} field is filled with the sampled source SMILES, and the \texttt{Adjustments} field is generated by comparing the molecule's initial property values with the task thresholds $\Theta_p$. 
+Sub-optimal properties are converted into explicit improvement objectives, while already satisfactory properties are converted into preservation constraints. 
+The quantitative targets are wrapped in \texttt{<THRESHOLD>} tags, and the model is instructed to return only the optimized molecule enclosed in \texttt{<SMILES>} tags.
+
+For general-purpose LLM baselines, Figure~\ref{fig:prompt_llm} shows the corresponding few-shot prompting template. 
+It provides a medicinal-chemistry system instruction, a molecular editing example, explicit property-wise thresholds, and the same constrained SMILES-only output format.
+
+
+
+\section{Details on Evaluation Metrics}
+\label{appendix:metrics}
+
+\subsection{C-MuMOInstruct}
+\label{appendix:c-mumoinstruct}
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+
+\begin{tabular}{@{}cll@{}}
+\toprule
+\textbf{Type} & \textbf{Task} & \textbf{Target Properties ($\mathcal{P}$-Comb)} \\
+\midrule
+\multirow{5}{*}{IND} 
+& BPQ  & BBBP, PlogP, QED \\
+& ELQ  & hERG, LIV, QED \\
+& ACEP & AMP, CARC, hERG, PlogP \\
+& BDPQ & BBBP, DRD2, PlogP, QED \\
+& DHMQ & DRD2, hERG, MUT, QED \\
+\cmidrule{1-3}
+\multirow{5}{*}{OOD} 
+& CDE   & CARC, DRD2, hERG \\
+& ABMP  & AMP, BBBP, MUT, PlogP \\
+& BCMQ  & BBBP, CARC, MUT, QED \\
+& BDEQ  & BBBP, DRD2, hERG, QED \\
+& HLMPQ & hERG, LIV, MUT, PlogP, QED \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3cm}
+
+\begin{tabular}{@{}lcc@{\hspace{0.8cm}}lcc@{}}
+\toprule
+\textbf{Prop.} & $\Delta_p$ & $\Theta_p$ & \textbf{Prop.} & $\Delta_p$ & $\Theta_p$ \\
+\midrule
+AMP  & 0.1 & 0.8 & HIA   & 0.1 & 0.9 \\
+BBBP & 0.1 & 0.8 & LIV   & 0.1 & 0.5 \\
+CARC & 0.2 & 0.2 & MUT   & 0.1 & 0.2 \\
+DRD2 & 0.1 & 0.4 & PlogP & 1.0 & 1.5 \\
+hERG & 0.2 & 0.3 & QED   & 0.1 & 0.9 \\
+\bottomrule
+\end{tabular}
+
+\caption{Overview of C-MuMOInstruct evaluation tasks and property thresholds. \textbf{(Top)} Target property combinations for both IND and OOD scenarios. \textbf{(Bottom)} The target improvement margins ($\Delta_p$) and near-optimal constraints ($\Theta_p$) for the 10 pharmacological properties.}
+\label{tab:dataset_summary}
+\end{table}
+\paragraph{Generation Protocols.}
+
+\label{appendix:generation}
+Following the standard C-MuMOInstruct evaluation protocol~\cite{dey2025large}, each method is evaluated under a fixed candidate budget of 20 generated molecules for each source molecule. For LLM-based methods, we use deterministic beam search with a beam width of 20 rather than stochastic sampling. Therefore, the 20 candidates correspond to the top beam hypotheses produced under the same decoding budget.
+
+After candidate generation, the final output molecule is selected using the same task-level candidate selection rule as in the benchmark, as described in Algorithm~\ref{alg:beam_search}. The selected molecule is then used to compute SOR, SSOR, SIM, and RI. This protocol is applied uniformly to all baselines and all \textsc{C-Moral} variants, ensuring that all methods are compared under the same candidate budget, property evaluators, and selection rule.
+
+\paragraph{Metrics}
+To rigorously evaluate the performance of lead optimization, we formulate our four evaluation metrics mathematically. Let $M_{src}$ denote the initial hit (source) molecule and $M_{gen}$ denote the generated candidate. We partition the pharmacological properties into two sets: $\mathcal{P}_{sub}$ representing the targeted sub-optimal properties that require improvement, and $\mathcal{P}_{con}$ representing the stability constraints or near-optimal properties that must be maintained.
+
+\paragraph{1. Similarity (\textsc{Sim})}
+To quantify structural preservation, we compute the Tanimoto similarity over Morgan fingerprints (radius 2, 2048 bits) between the generated candidate and the initial hit. All fingerprint generations and similarity calculations are implemented using the open-source cheminformatics RDKit. This ensures that the optimization strictly occurs within the valid chemical neighborhood of the lead compound. 
+\[
+\begin{aligned}
+    \textsc{Sim}(M_{src}, M_{gen}) = & \\
+    \frac{|\text{Morgan}(M_{src}) \cap \text{Morgan}(M_{gen})|}{|\text{Morgan}(M_{src}) \cup \text{Morgan}(M_{gen})|}
+\end{aligned}
+\]
+The overall \textsc{Sim} score reported in our results is the average Tanimoto similarity across all valid generated molecules.
+
+\paragraph{2. Success Optimized Rate (\textsc{Sor})}
+To ensure that the reported improvements are chemically meaningful and robust to model noise, we introduce a significance margin $\Delta_k$. We divide the target properties into two subsets: $\mathcal{P}_{sub}$, containing properties that require directional optimization, and $\mathcal{P}_{con}$, containing properties that should remain stable relative to the source hit.
+
+
+
+For each property $p \in \mathcal{P}_{sub}$, we define a direction indicator $s_p \in \{+1,-1\}$, where $s_p=+1$ denotes that the property is expected to increase and $s_p=-1$ denotes that it is expected to decrease. A generated molecule is considered successful on the optimization subset if all such properties improve beyond the significance margin:
+\[
+    C_{sub}^{(i)} = \prod_{p \in \mathcal{P}_{sub}} \mathbb{I}\left( s_p \bigl(p(M_{gen}^{(i)}) - p(M_{src}^{(i)})\bigr) \geq \Delta_k \right).
+\]
+
+For each property $q \in \mathcal{P}_{con}$, we require the generated molecule to remain within a tolerance band around the source hit:
+\[
+    C_{con}^{(i)} = \prod_{q \in \mathcal{P}_{con}} \mathbb{I}\left( \left| q(M_{gen}^{(i)}) - q(M_{src}^{(i)}) \right| \le \Delta_k \right).
+\]
+
+The overall \textsc{Sor} is then defined as the fraction of hit-candidate pairs that satisfy both conditions:
+\[
+    \textsc{Sor} = \frac{1}{N} \sum_{i=1}^N \left( C_{sub}^{(i)} \cdot C_{con}^{(i)} \right).
+\]
+
+In our experiments, $\Delta_k$ is chosen according to the standard deviation or the known error bar of the corresponding property predictor.
+
+
+
+\paragraph{3. Strict Success Optimized Rate (\textsc{Ssor})}
+While \textsc{Sor} evaluates whether a generated molecule achieves meaningful directional improvements on the target subset while preserving the constrained subset within tolerance, it does not require the final molecule to satisfy strict near-optimal criteria on all relevant properties. We therefore introduce the \textsc{Strict Success Optimized Rate} (\textsc{Ssor}), which measures the fraction of generated molecules whose properties all fall within the desired near-optimal region.
+
+Let $\Theta_r$ denote the near-optimal threshold for property $r \in \mathcal{P}$, where the satisfaction direction depends on the property type. We define the strict success indicator for the $i$-th pair as
+\[
+    C_{strict}^{(i)} = \prod_{r \in \mathcal{P}} \mathbb{I}\bigl( \mathrm{sat}_r(M_{gen}^{(i)}; \Theta_r) = 1 \bigr),
+\]
+where $\mathrm{sat}_r(\cdot;\Theta_r)$ is a property-specific satisfaction function indicating whether property $r$ meets its corresponding near-optimal threshold.
+
+The overall \textsc{Ssor} is then defined as
+\[
+    \textsc{Ssor} = \frac{1}{N} \sum_{i=1}^N C_{strict}^{(i)}.
+\]
+
+In other words, \textsc{Ssor} is a stricter metric than \textsc{Sor}, requiring all relevant properties to reach their prescribed near-optimal targets simultaneously.
+
+
+
+\paragraph{4. Relative Improvement (\textsc{Ri})}
+While \textsc{Sor} and \textsc{Ssor} measure whether a generated molecule satisfies the desired optimization criteria, they do not reflect the magnitude of improvement. We therefore define the \textsc{Relative Improvement} (\textsc{Ri}) to quantify the average directional relative change on the subset of sub-optimal properties.
+
+For each property $p \in \mathcal{P}_{sub}$, let $s_p \in \{+1,-1\}$ denote its desired optimization direction, where $s_p=+1$ indicates that the property is expected to increase and $s_p=-1$ indicates that it is expected to decrease. We first define the instance-level relative improvement as
+\[
+\textsc{Ri}^{(i)}
+=
+\frac{1}{|\mathcal{P}_{sub}|}
+\sum_{p \in \mathcal{P}_{sub}}
+\frac{
+s_p \bigl(p(M_{gen}^{(i)}) - p(M_{src}^{(i)})\bigr)
+}{
+\left|p(M_{src}^{(i)})\right|
+}.
+\]
+
+The overall \textsc{Ri} is then computed by averaging over all molecule pairs:
+\[
+\textsc{Ri}
+=
+\frac{1}{N}\sum_{i=1}^{N}\textsc{Ri}^{(i)}.
+\]
+
+In this way, \textsc{Ri} measures the average relative change on sub-optimal properties in their desired optimization directions: positive values indicate improvement, while negative values indicate movement against the target direction.
+
+\subsection{S$^2$-Bench MolOpt}
+\label{appendix:s2bench}
+
+To evaluate the generalization and open-domain optimization capabilities of \textsc{C-Moral}, we adopt the $S^2$-Bench (TOMG-Bench) \cite{li2025speaktostructureevaluatingllmsopendomain}. The Molecule Optimization (MolOpt) task requires the model to modify a lead compound to achieve a specific property shift while preserving the core scaffold. We employ four primary metrics:
+\begin{itemize}
+    \item \textbf{Validity:} The proportion of generated SMILES strings successfully parsed by RDKit.
+    \item \textbf{Similarity:} Tanimoto similarity (Morgan fingerprints) between source and candidate molecules, ensuring minimal, targeted edits.
+    \item \textbf{Success Rate (SR):} The proportion of valid, structurally similar candidates that satisfy the property target threshold.
+    \item \textbf{Weighted Success Rate (WSR):} The  similarity-weighted success rate, computed as $\mathrm{WSR} = \mathrm{SR} \times \mathrm{Sim}$. It measures the joint quality of property success and
+    structural preservation.
+\end{itemize}
+
+This weighted scoring mechanism prevents models from achieving high success rates by generating structurally distant, high-scoring molecules.
+
+
+
+% \begin{table*}[t]
+% \centering
+% \footnotesize
+% \setlength{\tabcolsep}{1.8pt}
+% \renewcommand{\arraystretch}{1.22}
+% \resizebox{\textwidth}{!}{
+% \begin{tabular}{@{}l ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{}}
+% \toprule
+% \multirow{2}{*}{\textbf{Model}} & \multicolumn{3}{c}{\textsc{Bpq}} & \multicolumn{3}{c}{\textsc{Elq}} & \multicolumn{3}{c}{\textsc{Acep}} & \multicolumn{3}{c}{\textsc{Bdpq}} & \multicolumn{3}{c}{\textsc{Dhmq}} \\
+% \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+% & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ \\
+% \midrule
+
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{General Purpose LLMs}} \\
+% Llama        & 5.4\,/\,1.9 & 0.66 & 0.79
+%              & 4.3\,/\,1.2 & 0.64 & 0.32
+%              & 3.1\,/\,0.7 & 0.59 & 1.21
+%              & 1.1\,/\,0.2 & 0.63 & 19.1
+%              & 0.9\,/\,0.1 & 0.60 & 18.7
+% \\
+% Mistral      & 4.4\,/\,1.2 & 0.62 & 0.81
+%              & 4.5\,/\,0.5 & 0.65 & 0.35
+%              & 2.7\,/\,0.6 & 0.60 & 1.19
+%              & 0.7\,/\,0.0 & 0.59 & 15.2
+%              & 0.8\,/\,0.1 & 0.61 & 17.6
+% \\
+% Llama(1-shot) & 6.8\,/\,2.0 & 0.63 & 0.81
+%               & 6.9\,/\,2.2 & 0.65 & 0.41
+%               & 5.2\,/\,1.8 & 0.61 & 1.17
+%               & 2.1\,/\,0.4 & 0.63 & 21.4
+%               & 2.5\,/\,0.9 & 0.61 & 23.5
+% \\
+% Mistral(1-shot) & 10.8\,/\,4.5 & 0.60 & 1.21
+%                 & 7.5\,/\,3.1 & 0.63 & 0.39
+%                 & 5.1\,/\,1.9 & 0.61 & 1.52
+%                 & 3.0\,/\,1.3 & 0.59 & 16.7
+%                 & 2.6\,/\,0.7 & 0.62 & 26.6
+% \\
+% GPT-5o(1-shot) & 7.4\,/\,2.1 & 0.64 & 1.01
+%               & 9.9\,/\,2.9 & 0.59 & 0.33
+%               & 6.6\,/\,1.8 & 0.61 & 1.78
+%               & 2.9\,/\,1.4 & 0.65 & 14.6
+%               & 3.6\,/\,1.3 & 0.62 & 31.5
+
+% \\
+% GPT-5o(2-shot) & 11.6\,/\,4.3 & 0.61 & 1.43 
+%               & 12.7\,/\,4.6 & 0.60 & 0.35
+%               & 6.8\,/\,2.1 & 0.69 & 2.32
+%               & 3.7\,/\,1.8 & 0.59 & 11.1
+%               & 4.0\,/\,1.9 & 0.63 & 52.4
+
+% \\
+
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{Expert Models}} \\
+% REINVENT-4 & 4.2\,/\,1.4 & 0.61 & 1.95
+%            & 3.4\,/\ 1.1 & 0.56 & 0.47
+%            & 5.1\,/\ 2.3 & 0.59 & 1.24
+%            & 2.4\,/\ 1.0 & 0.60 & 17.4
+%            & 2.6\,/\ 0.9 & 0.58 & 25.1
+% \\
+% MolT5-Large & 1.3\,/\,0.2 & 0.61 & 1.44
+%             & 0.9\,/\,0.1 & 0.60 & 0.40
+%             & 1.9\,/\,1.0 & 0.60 & 1.52
+%             & 0.2\,/\,0.0 & 0.63 & 9.8
+%             & 0.4\,/\,0.1 & 0.64 & 41.3
+% \\
+% MolT5-Large & 24.8\,/\,7.8 & 0.62 & 2.39
+%             & 22.2\,/\,9.2 & 0.60 & 0.45
+%             & 12.8\,/\,4.0 & 0.63 & 3.95
+%             & 5.6\,/\,1.4 & 0.60 & 13.5
+%             & 4.0\,/\,0.8 & 0.64 & 81.4
+
+% \\
+% GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 52.2\,/\,21.0 & \underline{0.59} & 2.72 
+%                                   & 62.0\,/\,30.2 & \textbf{0.58} & 0.48 
+%                                   & 29.6\,/\,11.0 & \underline{0.58} & 3.55 
+%                                   & 11.8\,/\,4.6 & \underline{0.56} & 188.4 
+%                                   & 13.2\,/\,5.4 & 0.60 & 61.9 \\
+% GeLLM$^4$O-C$_{\mathrm{Llama}}$ & 48.0\,/\,22.8 & 0.56 & 2.61 
+%                                 & 53.8\,/\,24.8 & 0.56 & 0.47 
+%                                 & 31.6\,/\,13.02 & 0.55 & 3.82 
+%                                 & 10.2\,/\,4.6 & 0.54 & 40.2 
+%                                 & 7.4\,/\,3.2 & 0.57 & \underline{259.2} \\
+
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{RL Post-Training (\textsc{C-Moral}, Ours)}} \\
+
+% MolT5-Large-GRPO          & 31.0\,/\,11.6 & 0.61 & 2.97
+%                           & 37.0\,/\,15.6 & 0.59 & 2.49
+%                           & 18.2\,/\,8.4 & 0.61 & 2.45
+%                           & 8.6\,/\,2.1 & 0.60 & 93.7
+%                           & 5.2\,/\,1.8 & 0.64 & 25.23
+% \\
+% MolT5-Large-GDPO          & 33.4\,/\,13.8 & 0.60 & 3.91
+%                           & 33.0\,/\,13.6 & 0.60 & 0.48
+%                           & 20.4\,/\,11.9 & 0.58 & 2.07
+%                           & 7.8\,/\,2.4 & 0.61 & 202.3
+%                           & 5.3\,/\,2.2 & 0.62 & 36.8
+% \\
+% GRPO$_{\mathrm{Mistral}}$ & \underline{65.7}\,/\,36.4 & \textbf{0.60} & 3.22 
+%                           & \textbf{73.4}\,/\,\textbf{38.8} & 0.58 & \underline{0.51} 
+%                           & 42.4\,/\,20.8 & \textbf{0.59} & 3.54 
+%                           & \textbf{24.8}\,/\,\textbf{11.6} & \textbf{0.58} & 238.2 
+%                           & \textbf{38.2}\,/\,\textbf{18.0} & \underline{0.62} & 234.9 \\
+% GDPO$_{\mathrm{Mistral}}$ & \textbf{69.8}\,/\,\underline{40.2} & 0.58 &                                          \underline{4.05} 
+%                           & \underline{72.8}\,/\,\underline{37.0} & \underline{0.57} & \textbf{0.53} 
+%                           & \underline{44.4}\,/\,\underline{23.0} & 0.57 & \textbf{4.15} 
+%                           & \underline{22.6}\,/\,10.0 & \textbf{0.58} & \textbf{391.5} 
+%                           & \underline{25.6}\,/\,\underline{14.2} & \textbf{0.63} & 151.5 \\
+% GRPO$_{\mathrm{Llama}}$ & 57.8\,/\,26.6 & \underline{0.59} & 3.50
+%                         & 60.0\,/\,28.6 & \underline{0.57} & \underline{0.51}
+%                         & \textbf{45.2}\,/\,\textbf{25.0} & \underline{0.58} & 3.06
+%                         & 21.6\,/\,\underline{10.8} & \underline{0.56} & 256.2
+%                         & 16.6\,/\,9.2 & 0.60 & 249.5
+% \\
+% GDPO$_{\mathrm{Llama}}$ & 66.0\,/\,\textbf{44.8} & 0.57 & \textbf{4.43}
+%                         & 64.2\,/\,34.6 & \underline{0.57} & \underline{0.51}
+%                         & 43.7\,/\,22.7 & 0.57 & \underline{4.09}
+%                         & 18.5\,/\,9.9 & 0.56 & \underline{271.1}
+%                         & 24.4\,/\,15.1 & 0.60 & \textbf{271.6}
+% \\
+
+% \bottomrule
+% \end{tabular}
+% }
+% \caption{Detailed performance comparison on IND tasks. \textsc{C-Moral} consistently improves success rates over SFT baselines while preserving scaffold similarity. Bold denotes the best result in each column, and underlined denotes the second-best.}
+% \label{tab:ind_results}
+% \end{table*}
+
+\section{Group Policy over PPO}
+\label{appendix:ppo}
+
+\textbf{Superiority of Group-Relative Alignment over PPO.}
+A critical question in RL post-training is whether specialized group-relative frameworks are strictly necessary compared to standard Proximal Policy Optimization (PPO). As detailed in Table \ref{tab:rl_algorithm_comparison} and Figure \ref{fig:ppo}, the answer is definitively yes. Empirically, PPO struggles to navigate the highly constrained, conflicting reward landscapes of molecular optimization. Its reliance on a separate, memory-intensive value network often leads to unstable advantage estimation when multiple heterogeneous objectives compete.
+
+Consequently, \textsc{C-Moral}'s group-based variants achieve consistently higher success rates under both IND and OOD settings. On the representative Mistral IND tasks, \textsc{C-Moral} delivers an absolute gain of $+8.4\%$ in SOR and $+5.5\%$ in SSOR over PPO, while also converging approximately $3.0\times$ faster (Figure \ref{fig:ppo}). By normalizing advantages directly across peer candidates rather than struggling to fit an absolute value baseline, \textsc{C-Moral} provides a much sharper and more stable gradient signal. This confirms that group-relative alignment is better suited for the delicate structural trade-offs required in lead optimization across both in-domain and out-of-domain objective settings.
+
+\begin{table*}[h]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+
+% ==========================================
+% Sub-table (a): Mistral Results
+% ==========================================
+\textbf{(a) Performance based on Mistral-7B architecture}
+
+\vspace{4pt}
+
+\begin{tabular}{@{} l llll llll @{}}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{4}{c}{In-Domain (IND)} & \multicolumn{4}{c}{Out-of-Domain (OOD)} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+& \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ \\
+\midrule
+SFT Baseline & 33.7 & 14.4 & 0.58 & 51.4 & 24.4 & 9.8 & 0.60 & 27.3 \\
+PPO & 40.5{\scriptsize$\pm$4.1} & 19.6{\scriptsize$\pm$2.1} & 0.57{\scriptsize$\pm$0.02} & 81.7{\scriptsize$\pm$11.5} 
+    & 32.0{\scriptsize$\pm$3.6} & 14.4{\scriptsize$\pm$1.8} & 0.59{\scriptsize$\pm$0.01} & 23.6{\scriptsize$\pm$4.7} \\
+GRPO & 48.9{\scriptsize$\pm$5.0} & 25.1{\scriptsize$\pm$3.0} & 0.59{\scriptsize$\pm$0.01} & 96.1{\scriptsize$\pm$10.7} 
+     & 39.5{\scriptsize$\pm$3.9} & 20.8{\scriptsize$\pm$2.8} & 0.60{\scriptsize$\pm$0.03} & 19.5{\scriptsize$\pm$3.3} \\
+GDPO & 47.0{\scriptsize$\pm$3.9} & 25.0{\scriptsize$\pm$2.8} & 0.59{\scriptsize$\pm$0.01} & 110.4{\scriptsize$\pm$14.2} 
+     & 38.3{\scriptsize$\pm$3.0} & 19.8{\scriptsize$\pm$2.5} & 0.59{\scriptsize$\pm$0.02} & 27.2{\scriptsize$\pm$3.9} \\
+\bottomrule
+\end{tabular}
+
+\vspace{12pt}
+
+% ==========================================
+% Sub-table (b): Llama Results
+% ==========================================
+\textbf{(b) Performance based on Llama-8B architecture}
+
+\vspace{4pt}
+
+\begin{tabular}{@{} l llll llll @{}}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{4}{c}{In-Domain (IND)} & \multicolumn{4}{c}{Out-of-Domain (OOD)} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+& \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ & \textbf{SOR}$^{\uparrow}$ & \textbf{SSOR}$^{\uparrow}$ & \textbf{Sim}$^{\uparrow}$ & \textbf{RI}$^{\uparrow}$ \\
+\midrule
+SFT Baseline & 30.2 & 13.7 & 0.56 & 61.3 & 25.2 & 10.2 & 0.57 & 6.5 \\
+PPO & 35.9{\scriptsize$\pm$3.8} & 16.1{\scriptsize$\pm$1.1} & 0.57{\scriptsize$\pm$0.03} & 68.6{\scriptsize$\pm$6.2} 
+    & 29.1{\scriptsize$\pm$2.1} & 12.8{\scriptsize$\pm$1.2} & 0.58{\scriptsize$\pm$0.02} & 19.4{\scriptsize$\pm$4.1} \\
+GRPO & 40.3{\scriptsize$\pm$4.3}
+     & 20.1{\scriptsize$\pm$1.4}
+     & 0.58{\scriptsize$\pm$0.01} 
+     & 102.6{\scriptsize$\pm$9.4} 
+     & 37.2{\scriptsize$\pm$2.9}
+     & 19.6{\scriptsize$\pm$1.8}
+     & 0.60{\scriptsize$\pm$0.02} 
+     & 10.5{\scriptsize$\pm$4.3} \\
+GDPO & 43.4{\scriptsize$\pm$5.7} 
+     & 25.4{\scriptsize$\pm$1.6}
+     & 0.57{\scriptsize$\pm$0.02} 
+     & 110.3{\scriptsize$\pm$10.1} 
+     & 35.6{\scriptsize$\pm$3.0} 
+     & 19.5{\scriptsize$\pm$1.6}
+     & 0.59{\scriptsize$\pm$0.01} 
+     & 19.1{\scriptsize$\pm$5.1} \\
+\bottomrule
+\end{tabular}
+
+\caption{
+Comparison of RL algorithms under identical non-linear reward aggregation and sigmoid alignment. 
+We report results on both Mistral-7B and Llama-8B backbones across In-Domain (IND) and Out-of-Domain (OOD) C-MuMOInstruct tasks. 
+The SFT baseline is evaluated once from the fixed checkpoint, while all RL post-training results are averaged over three random seeds and reported as mean $\pm$ standard deviation.
+}
+\label{tab:rl_algorithm_comparison}
+\end{table*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/bpq_grpo_vs_ppo.pdf}
+    \caption{Training efficiency comparison of GRPO vs. PPO on the BPQ task (based on Mistral 7B). The learning curves for the overall reward and individual properties (Bbbp, Plogp, Qed, Sim) demonstrate that GRPO converges $\approx 3.0\times$ faster than PPO. An initial 30-iteration warmup phase applied to PPO is excluded from the plot.}
+    \label{fig:ppo}
+\end{figure*}
+
+
+\section{Group-Based Policy Optimization Implementation}
+\subsection{Group Relative Policy Optimization}
+\label{appendix:grpo_implementation}
+We provide the implementation details of GRPO used in our experiments.
+Consider a mini-batch of prompts $\{x_i\}_{i=1}^{B}$.
+For each prompt $x_i$, we sample a group of $G$ responses
+\[
+\mathcal{Y}_i = \{y_{i,1}, \dots, y_{i,G}\},
+\qquad
+y_{i,j} \sim \pi_{\Theta_{\mathrm{old}}}(\cdot \mid x_i).
+\]
+
+Assume there are $M$ property-wise aligned scores.
+The $m$-th aligned score of response $y_{i,j}$ is denoted by
+\[
+s_{i,j}^{(m)} = s_m(x_i, y_{i,j}),
+\qquad
+m = 1, \dots, M.
+\]
+
+In standard multi-reward GRPO, multiple reward dimensions are often aggregated into a single scalar reward before group-wise normalization. 
+In \textsc{C-Moral}-GRPO, we replace linear aggregation with the sigmoid-aligned geometric mean reward defined in Eq.~\ref{eq:geometric_mean}. 
+Specifically, the scalar reward for response $y_{i,j}$ is computed as
+\[
+r_{i,j}^{\mathrm{GRPO}}
+=
+\left(
+\prod_{m=1}^{M} s_{i,j}^{(m)}
+\right)^{1/M}
+\]
+This scalar reward is then used for group-relative normalization.
+
+For each prompt $x_i$, we then compute the group mean and group standard deviation over the $G$ sampled responses:
+\[
+\mu_i
+=
+\frac{1}{G} \sum_{j=1}^{G} r_{i,j}^{\mathrm{GRPO}},
+\]
+\[
+\sigma_i
+=
+\sqrt{
+\frac{1}{G} \sum_{j=1}^{G}
+\bigl(r_{i,j}^{\mathrm{GRPO}} - \mu_i\bigr)^2
+}.
+\]
+The group-relative advantage is defined as
+\[
+A_{i,j}^{\mathrm{GRPO}}
+=
+\frac{r_{i,j}^{\mathrm{GRPO}} - \mu_i}{\sigma_i + \epsilon_{\mathrm{grp}}},
+\]
+where $\epsilon_{\mathrm{grp}}$ is a small constant for numerical stability.
+
+For token $t$ in response $y_{i,j}$, the importance ratio is
+\[
+\rho_{i,j,t}(\Theta)
+=
+\frac{
+\pi_{\Theta}(y_{i,j,t} \mid x_i, y_{i,j,<t})
+}{
+\pi_{\Theta_{\mathrm{old}}}(y_{i,j,t} \mid x_i, y_{i,j,<t})
+}.
+\]
+
+The GRPO objective is
+\[
+\begin{split}
+\mathcal{L}_{\mathrm{GRPO}}(\Theta)
+=
+\frac{1}{B} \sum_{i=1}^{B}
+\frac{1}{G} \sum_{j=1}^{G}
+\frac{1}{|y_{i,j}|} \\\sum_{t=1}^{|y_{i,j}|}
+\min\Big(
+\rho_{i,j,t}(\Theta)A_{i,j},
+\\
+\operatorname{clip}\big(\rho_{i,j,t}(\Theta),1-\epsilon_{\mathrm{clip}},1+\epsilon_{\mathrm{clip}}\big)
+A_{i,j}
+\Big).
+\end{split}
+\]
+
+In our implementation, we include a KL regularization term following the standard GRPO formulation.
+Compared with GDPO, GRPO performs normalization only after collapsing all reward dimensions into a single scalar reward, rather than normalizing each reward dimension separately before aggregation.
+
+\subsection{Group reward-Decoupled Normalization
+Policy Optimization}
+\label{appendix:gdpo_implementation}
+
+We provide the implementation details of GDPO used in our experiments.
+Consider a mini-batch of prompts $\{x_i\}_{i=1}^{B}$.
+For each prompt $x_i$, we sample a group of $G$ responses
+\[
+\mathcal{Y}_i = \{y_{i,1}, \dots, y_{i,G}\}, \qquad
+y_{i,j} \sim \pi_{\Theta_{\mathrm{old}}}(\cdot \mid x_i).
+\]
+Assume there are $M$ reward functions.
+The $m$-th reward of response $y_{i,j}$ is denoted by
+\[
+r_{i,j}^{(m)} = r_m(x_i, y_{i,j}), \qquad m = 1, \dots, M.
+\]
+
+\paragraph{Step 1: Group-wise decoupled normalization.}
+For each prompt $x_i$ and each reward dimension $m$, we first compute the
+group mean and group standard deviation over the $G$ sampled responses:
+\[
+\mu_i^{(m)} = \frac{1}{G} \sum_{j=1}^{G} r_{i,j}^{(m)},
+\]
+\[
+\sigma_i^{(m)} =
+\sqrt{
+\frac{1}{G} \sum_{j=1}^{G} \bigl(r_{i,j}^{(m)} - \mu_i^{(m)}\bigr)^2
+}.
+\]
+Then the reward-specific normalized advantage is
+\[
+A_{i,j}^{(m)} =
+\frac{r_{i,j}^{(m)} - \mu_i^{(m)}}{\sigma_i^{(m)} + \epsilon_{\mathrm{grp}}}.
+\]
+
+\paragraph{Step 2: Smooth-min aggregation of decoupled advantages.}
+After obtaining the reward-specific normalized advantages, we aggregate them using a smooth-min operator based on negative Log-Sum-Exp:
+\begin{equation}
+\tilde{A}_{i,j}
+=
+-\frac{1}{\tau}
+\log
+\left(
+\frac{1}{M}
+\sum_{m=1}^{M}
+\exp\left(-\tau w_m A^{(m)}_{i,j}\right)
+\right),
+\end{equation}
+where $\tau>0$ controls the sharpness of the smooth-min operator, and $w_m \ge 0$ is the weight of the $m$-th reward dimension. In our default setting, we use $w_m=1$ for all reward dimensions unless otherwise specified. This aggregation gives larger influence to the weakest property-wise advantage, thereby reducing the implicit sacrifice of difficult molecular constraints.
+
+\paragraph{Step 3: Batch-wise normalization (BN).}
+To keep the numerical scale of advantages stable as the number of rewards increases,
+we further normalize $\tilde{A}_{i,j}$ over all responses in the current mini-batch.
+Let
+\[
+\mu_{\mathcal{B}} =
+\frac{1}{BG} \sum_{i=1}^{B} \sum_{j=1}^{G} \tilde{A}_{i,j},
+\]
+\[
+\sigma_{\mathcal{B}} =
+\sqrt{
+\frac{1}{BG} \sum_{i=1}^{B} \sum_{j=1}^{G}
+\bigl(\tilde{A}_{i,j} - \mu_{\mathcal{B}}\bigr)^2
+}.
+\]
+The final GDPO advantage is
+\[
+\hat{A}_{i,j} =
+\frac{\tilde{A}_{i,j} - \mu_{\mathcal{B}}}{\sigma_{\mathcal{B}} + \epsilon_{\mathrm{bn}}}.
+\]
+This step is crucial in the original paper. After testing, we find it also important for stable training.
+
+\paragraph{Step 4: Policy optimization objective.}
+We then use the final normalized advantage $\hat{A}_{i,j}$ in a clipped policy
+optimization objective.
+For token $t$ in response $y_{i,j}$, define the importance ratio as
+\[
+\rho_{i,j,t}(\Theta)
+=
+\frac{
+\pi_{\Theta}(y_{i,j,t} \mid x_i, y_{i,j,<t})
+}{
+\pi_{\Theta_{\mathrm{old}}}(y_{i,j,t} \mid x_i, y_{i,j,<t})
+}.
+\]
+The GDPO objective is
+\[
+\begin{aligned}
+\mathcal{L}_{\mathrm{GDPO}}(\Theta)
+&=
+\frac{1}{B} \sum_{i=1}^{B}
+\frac{1}{G} \sum_{j=1}^{G}
+\frac{1}{|y_{i,j}|} \sum_{t=1}^{|y_{i,j}|}
+\min\!\Bigl(
+\rho_{i,j,t}(\Theta)\,\hat{A}_{i,j}, \\
+&\qquad\qquad
+\mathrm{clip}\bigl(
+\rho_{i,j,t}(\Theta),\, 1-\epsilon_{\mathrm{clip}},\, 1+\epsilon_{\mathrm{clip}}
+\bigr)\hat{A}_{i,j}
+\Bigr).
+\end{aligned}
+\]
+
+If a KL regularization term is used in practice, it can be added in the standard way.
+The key difference from multi-reward GRPO is that GDPO normalizes each reward
+\emph{before} aggregation, and then applies an additional batch-wise normalization
+to the aggregated advantage.
+
+\section{Case Studies}
+\subsection{BPQ Task}
+BPQ (BBBP, PlogP, QED) involves diverse combinations of property-specific objectives across BBBP, PlogP, and QED, three key properties for CNS drug design. Each optimization task may require improving one or more properties while maintaining or further enhancing the others. Optimizing these diverse multi-objective combinations simulates the early-stage filtering and refinement of CNS-active hit compounds.
+
+Figure~\ref{fig:bpq_mistral_optimization} presents one representative example from the BPQ task. Compared with the SFT baseline in Figure~\ref{fig:bpq_mistral_gellmo}, both RL post-trained models produce more favorable BPQ edits while better preserving meaningful structural motifs. GeLLM$^4$O-C$_{\mathrm{Mistral}}$ achieves the target improvement mainly through a relatively aggressive rewrite of the left-half structure, replacing the original peripheral heterocyclic region with a more compact motif while keeping only part of the right aromatic scaffold. In contrast, \textsc{C-Moral}-GRPO$_{\mathrm{Mistral}}$ in Figure~\ref{fig:bpq_mistral_grpo} performs a larger global restructuring, substantially changing both the aromatic core and the surrounding substituents; although this yields strong property improvement, it is less conservative in scaffold preservation. \textsc{C-Moral}-GDPO$_{\mathrm{Mistral}}$ in Figure~\ref{fig:bpq_mistral_gdpo}, however, makes more targeted local edits: it largely retains the original amide-linked aromatic core and the morpholine-containing motif, while modifying the peripheral substituents to improve QED and PlogP under the BBBP constraint. This qualitative example suggests that GDPO tends to achieve a better balance between property optimization and structural preservation, whereas GRPO explores more radical scaffold-level changes.
+\begin{figure}[t]
+    \centering
+
+    \begin{subfigure}{0.9\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/bpq_mistral_gellmo.png}
+        \caption{GeLLM$^4$O-C$_{\mathrm{Mistral}}$ optimization}
+        \label{fig:bpq_mistral_gellmo}
+    \end{subfigure}
+
+    \vspace{0.8em}
+
+    \begin{subfigure}{0.9\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/bpq_mistral_grpo.png}
+        \caption{\textsc{C-Moral}-GRPO$_{\mathrm{Mistral}}$ optimization}
+        \label{fig:bpq_mistral_grpo}
+    \end{subfigure}
+
+    \vspace{0.8em}
+
+    \begin{subfigure}{0.9\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{figs/bpq_mistral_gdpo.png}
+        \caption{\textsc{C-Moral}-GDPO$_{\mathrm{Mistral}}$ optimization}
+        \label{fig:bpq_mistral_gdpo}
+    \end{subfigure}
+
+    \caption{Optimization of different \textsc{Mistral}-based models on the \textsc{Bpq} task.}
+    \label{fig:bpq_mistral_optimization}
+\end{figure}
+
+
+
+\clearpage
+
+\section{Complete Experimental Results}
+\label{appendix:complete_exp_results}
+\subsection{S$^2$-Bench MolOpt}
+Table~\ref{tab:molopt_results} reports the complete results on the MolOpt task from S$^2$-Bench. 
+Following the benchmark protocol, we evaluate three goal-oriented molecular optimization tasks: LogP, molecular refractivity (MR), and QED. 
+SR denotes the success rate of achieving the target property improvement, Sim denotes the Tanimoto similarity between the source and generated molecules, and WSR is computed as $\mathrm{SR} \times \mathrm{Sim}$ to measure the joint quality of property improvement and structural preservation. 
+Validity denotes the percentage of generated SMILES that can be parsed as valid molecules by RDKit. 
+Overall, \textsc{C-Moral} achieves the strongest WSR across all three tasks while maintaining high validity, showing that the proposed RL alignment strategy generalizes beyond C-MuMOInstruct to standard goal-oriented molecular optimization.
+
+
+\subsection{C-MuMOInstruct}
+\label{appendix:c-mumo_results}
+In Table~\ref{tab:ind_detailed_results} and \ref{tab:ood_detailed_results}, we provide complete per-task results on C-MuMOInstruct. 
+Table~\ref{tab:ind_detailed_results} reports detailed results on IND tasks, while Table~\ref{tab:ood_detailed_results} reports detailed results on OOD tasks. 
+For optimization performance, S/SS denotes SOR/SSOR: SOR measures whether the generated molecule satisfies the required property improvement and preservation constraints, while SSOR further requires all relevant properties to reach their prescribed near-optimal targets.
+Sim denotes the Tanimoto similarity between the source and generated molecules computed from Morgan fingerprints, and RI measures the relative improvement over sub-optimal properties. 
+We also report molecular quality metrics: Val denotes the percentage of RDKit-valid generated SMILES, SAS denotes the synthetic accessibility score where lower is better, and Nov denotes the percentage of valid generated molecules whose RDKit-canonicalized SMILES do not appear in the training set.
+
+\section{Licenses and Artifact Use}
+\label{appendix:licenses}
+Table~\ref{tab:artifact_licenses} summarizes the licenses, terms of use, and accessibility of the main artifacts used in this work. We use all artifacts only for research and evaluation purposes, following their intended use for molecular optimization, model evaluation, or computational property assessment. We do not redistribute the original datasets, model checkpoints, APIs, or external tools as part of this submission.
+
+
+\begin{table*}[t]
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{1.8pt}
+\renewcommand{\arraystretch}{1.18}
+
+\textbf{(a) Detailed IND performance}
+\vspace{2pt}
+
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}l ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Model}} & \multicolumn{3}{c}{\textsc{Bpq}} & \multicolumn{3}{c}{\textsc{Elq}} & \multicolumn{3}{c}{\textsc{Acep}} & \multicolumn{3}{c}{\textsc{Bdpq}} & \multicolumn{3}{c}{\textsc{Dhmq}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+& S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ \\
+\midrule
+
+\rowcolor{gray!15} \multicolumn{16}{c}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+Llama        & 4.4\,/\,1.9 & \textbf{0.69} & 0.79 & 4.3\,/\,1.2 & \textbf{0.66} & 0.32 & 3.1\,/\,0.7 & \underline{0.67} & 1.21 & 1.1\,/\,0.2 & 0.64 & 19.1 & 0.9\,/\,0.1 & \underline{0.65} & 18.7 \\
+Mistral      & 3.4\,/\,1.2 & \underline{0.65} & 0.81 & 4.5\,/\,0.5 & \underline{0.65} & 0.35 & 2.7\,/\,0.6 & 0.64 & 1.19 & 0.7\,/\,0.0 & \textbf{0.70} & 15.2 & 0.8\,/\,0.1 & \textbf{0.68} & 17.6 \\
+Llama (1-shot) & 4.8\,/\,2.0 & 0.59 & 0.81 & 6.9\,/\,2.2 & \underline{0.65} & 0.41 & 5.2\,/\,1.8 & 0.61 & 1.17 & 2.1\,/\,0.4 & \underline{0.68} & 21.4 & 2.5\,/\,0.9 & 0.62 & 23.5 \\
+Mistral (1-shot) & 10.8\,/\,4.5 & 0.58 & 1.21 & 7.5\,/\,3.1 & 0.63 & 0.39 & 5.1\,/\,1.9 & 0.61 & 1.52 & 3.0\,/\,1.3 & 0.59 & 16.7 & 2.6\,/\,0.7 & 0.62 & 26.6 \\
+GPT-5o (1-shot) & 7.4\,/\,2.1 & 0.64 & 1.01 & 9.9\,/\,2.9 & 0.59 & 0.33 & 6.6\,/\,1.8 & 0.61 & 1.78 & 2.9\,/\,1.4 & 0.65 & 14.6 & 3.6\,/\,1.3 & 0.62 & 31.5 \\
+GPT-5o (2-shot) & 11.6\,/\,4.3 & 0.58 & 1.43 & 12.7\,/\,4.6 & 0.60 & 0.35 & 6.8\,/\,2.1 & \textbf{0.69} & 2.32 & 3.7\,/\,1.8 & 0.59 & 11.1 & 4.0\,/\,1.9 & 0.63 & 52.4 \\
+
+\rowcolor{gray!15} \multicolumn{16}{c}{\textit{Expert Models \& SFT Baselines}} \\
+REINVENT-4 & 4.2\,/\,1.4 & 0.61 & 1.95 & 3.4\,/\,1.1 & 0.56 & 0.47 & 5.1\,/\,2.3 & 0.59 & 1.24 & 2.4\,/\,1.0 & 0.60 & 17.4 & 2.6\,/\,0.9 & 0.58 & 25.1 \\
+MolT5-Large (Base) & 1.3\,/\,0.2 & 0.61 & 1.44 & 0.9\,/\,0.1 & 0.60 & 0.40 & 1.9\,/\,1.0 & 0.60 & 1.52 & 0.2\,/\,0.0 & 0.63 & 9.8 & 0.4\,/\,0.1 & 0.64 & 41.3 \\
+MolT5-Large (SFT) & 24.8\,/\,7.8 & 0.62 & 2.39 & 22.2\,/\,9.2 & 0.60 & 0.45 & 12.8\,/\,4.0 & 0.63 & 3.95 & 5.6\,/\,1.4 & 0.60 & 13.5 & 4.0\,/\,0.8 & 0.64 & 81.4 \\
+GeLLM$^4$O-C$_{\mathrm{Llama}}$ & 48.0\,/\,22.8 & 0.56 & 2.61  & 53.8\,/\,24.8 & 0.56 & 0.47  & 31.6\,/\,13.02 & 0.55 & 3.82  & 10.2\,/\,4.6 & 0.54 & 40.2  & 7.4\,/\,3.2 & 0.57 & \underline{259.2} \\
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 52.2\,/\,21.0 & 0.59 & 2.72  & 62.0\,/\,30.2 & 0.58 & 0.48  & 29.6\,/\,11.0 & 0.58 & 3.55  & 11.8\,/\,4.6 & 0.56 & 188.4  & 13.2\,/\,5.4 & 0.60 & 61.9 \\
+
+\rowcolor{gray!15} \multicolumn{16}{c}{\textit{RL Post-Training (\textsc{C-Moral}, Ours)}} \\
+\multicolumn{16}{l}{\textbf{GRPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$ & 31.0\,/\,11.6 & 0.61 & 2.97 & 37.0\,/\,15.6 & 0.59 & \textbf{2.49} & 18.2\,/\,8.4 & 0.61 & 2.45 & 8.6\,/\,2.1 & 0.60 & 93.7 & 5.2\,/\,1.8 & 0.64 & 25.23 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$ & 57.8\,/\,26.6 & 0.59 & 3.50 & 60.0\,/\,28.6 & 0.57 & 0.51 & \textbf{45.2}\,/\,\textbf{25.0} & 0.58 & 3.06 & 21.6\,/\,\underline{10.8} & 0.56 & 256.2 & 16.6\,/\,9.2 & 0.60 & 249.5 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$ & 65.7\,/\,36.4 & 0.60 & 3.22  & \textbf{73.4}\,/\,\textbf{38.8} & 0.58 & 0.51  & 42.4\,/\,20.8 & 0.59 & 3.54  & \textbf{24.8}\,/\,\textbf{11.6} & 0.58 & 238.2  & \textbf{38.2}\,/\,\textbf{18.0} & 0.62 & 234.9 \\
+\addlinespace[3pt]
+
+\multicolumn{16}{l}{\textbf{GDPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$ & 33.4\,/\,13.8 & 0.60 & 3.91 & 33.0\,/\,13.6 & 0.60 & 0.48 & 20.4\,/\,11.9 & 0.58 & 2.07 & 7.8\,/\,2.4 & 0.61 & 202.3 & 5.3\,/\,2.2 & 0.62 & 36.8 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$ & \underline{66.0}\,/\,\textbf{44.8} & 0.57 & \textbf{4.43} & 64.2\,/\,34.6 & 0.57 & 0.51 & 43.7\,/\,22.7 & 0.57 & \underline{4.09} & 18.5\,/\,9.9 & 0.56 & \underline{271.1} & 24.4\,/\,\underline{15.1} & 0.60 & \textbf{271.6} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$ & \textbf{69.8}\,/\,\underline{40.2} & 0.58 & \underline{4.05}  & \underline{72.8}\,/\,\underline{37.0} & 0.57 & \underline{0.53}  & \underline{44.4}\,/\,\underline{23.0} & 0.57 & \textbf{4.15}  & \underline{22.6}\,/\,10.0 & 0.58 & \textbf{391.5}  & \underline{25.6}\,/\,14.2 & \underline{0.63} & 151.5 \\
+
+\bottomrule
+\end{tabular}
+}
+\vspace{6pt}
+
+\textbf{(b) Additional IND molecular quality metrics}
+\vspace{2pt}
+
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}l ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Model}} 
+& \multicolumn{3}{c}{\textsc{Bpq}} 
+& \multicolumn{3}{c}{\textsc{Elq}} 
+& \multicolumn{3}{c}{\textsc{Acep}} 
+& \multicolumn{3}{c}{\textsc{Bdpq}} 
+& \multicolumn{3}{c}{\textsc{Dhmq}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$ \\
+\midrule
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+Llama 
+& 96.20 & 2.76 & 100.00 
+& 97.80 & 2.89 & 100.00 
+& 95.20 & 2.72 & 99.79
+& 98.00 & 3.02 & 99.59
+& 95.80 & 2.99 & 100.00 \\
+Mistral
+& 88.20 & 2.81 & 98.98 
+& 91.40 & 2.87 & 100.00
+& 87.60 & 2.78 & 100.00
+& 78.60 & 2.80 & 100.00
+& 86.00 & 2.91 & 100.00 \\
+Llama (1-shot) 
+& 98.80 & 2.74 & 100.00 
+& 99.00 & 2.75 & 98.38 
+& 99.20 & 2.69 & 95.36 
+& 98.60 & 3.06 & 97.97
+& 99.40 & 2.78 & 93.16 \\
+Mistral (1-shot) 
+& 97.80 & 2.62 & 95.91 
+& 99.40 & 2.79 & 96.38
+& 98.80 & 2.71 & 93.12 
+& 99.20 & 2.58 & 96.57
+& 99.00 & 2.76 & 93.94 \\
+GPT-5o (1-shot) 
+& 92.40 & 2.75 & 98.48
+& 94.40 & 2.84 & 97.88
+& 92.80 & 2.67 & 98.06
+& 89.20 & 2.65 & 100.00
+& 88.80 & 2.71 & 99.10 \\
+GPT-5o (2-shot) 
+& 94.80 & 2.69 & 79.96
+& 95.60 & 2.80 & 83.68
+& 92.60 & 2.71 & 84.23
+& 91.00 & 2.69 & 89.01
+& 90.40 & 2.75 & 90.71 \\
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{Expert Models \& SFT Baselines}} \\
+REINVENT-4
+& 100.00 & 2.38 & 100.00
+& 100.00 & 2.62 & 99.60
+& 100.00 & 2.43 & 99.80
+& 100.00 & 2.46 & 99.80
+& 99.80 & 2.57 & 100.00 \\
+MolT5-Large (Base) 
+& 99.80 & 2.47 & 100.00
+& 99.60 & 2.72 & 100.00
+& 100.00 & 2.51 & 99.80
+& 98.80 & 2.54 & 99.60
+& 99.00 & 2.79 & 99.80 \\
+MolT5-Large (SFT) 
+& 98.20 & 2.35 & 97.34
+& 98.20 & 2.68 & 98.16
+& 99.40 & 2.31 & 98.19
+& 98.80 & 2.51 & 99.19
+& 99.00 & 2.67 & 98.38 \\
+GeLLM$^4$O-C$_{\mathrm{Llama}}$ 
+& 90.20 & 2.36 & 97.34
+& 90.80 & 2.64 & 97.80
+& 92.40 & 2.38 & 97.40
+& 89.20 & 2.55 & 98.21
+& 88.60 & 2.70 & 99.10 \\
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$ 
+& 98.80 & 2.32 & 97.98
+& 99.20 & 2.59 & 98.16
+& 100.00 & 2.36 & 99.20
+& 98.40 & 2.58 & 98.58
+& 99.00 & 2.67 & 99.00 \\
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{RL Post-Training (\textsc{C-Moral}, Ours)}} \\
+\multicolumn{16}{l}{\textbf{GRPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$ 
+& 98.40 & 2.26 & 98.98 
+& 99.20 & 2.49 & 98.79 
+& 99.20 & 2.12 & 95.77
+& 98.80 & 2.29 & 97.17
+& 98.40 & 2.69 & 97.36 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$ 
+& 100.00 & 2.28 & 98.80
+& 99.80 & 2.57 & 96.80
+& 99.80 & 2.26 & 97.39
+& 99.60 & 2.40 & 96.39
+& 100.00 & 2.62 & 97.80 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$ 
+& 100.00 & 2.34 & 98.20
+& 99.80 & 2.56 & 97.19
+& 100.00 & 2.36 & 98.40
+& 99.80 & 2.37 & 98.19
+& 100.00 & 2.67 & 99.00 \\
+\addlinespace[3pt]
+
+\multicolumn{16}{l}{\textbf{GDPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$ 
+& 98.40 & 2.25 & 98.98
+& 98.60 & 2.53 & 98.78
+& 98.40 & 2.14 & 99.60
+& 98.80 & 2.41 & 98.98
+& 98.40 & 2.61 & 99.20 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$ 
+& 100.00 & 2.13 & 98.80
+& 100.00 & 2.68 & 99.00
+& 100.00 & 2.09 & 98.80
+& 100.00 & 2.50 & 99.20
+& 100.00 & 2.59 & 99.40 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$ 
+& 100.00 & 2.24 & 99.20
+& 99.80 & 2.58 & 99.20
+& 100.00 & 2.23 & 98.80
+& 99.80 & 2.33 & 97.19
+& 100.00 & 2.61 & 98.60 \\
+
+\bottomrule
+\end{tabular}
+}
+
+\caption{
+IND per-task results on C-MuMOInstruct. 
+(a) Detailed performance comparison using S/SS, similarity, and RI. 
+(b) Additional molecular quality metrics, including validity, synthetic accessibility score (SAS), and novelty. 
+Val and Nov are reported in percentages; lower SAS indicates better synthetic accessibility.
+}
+\label{tab:ind_detailed_results}
+\end{table*}
+
+% \begin{table*}[t]
+% \centering
+% \footnotesize
+% \setlength{\tabcolsep}{1.8pt}
+% \renewcommand{\arraystretch}{1.22}
+% \resizebox{\textwidth}{!}{
+% \begin{tabular}{@{}l ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{}}
+% \toprule
+% \multirow{2}{*}{\textbf{Model}} 
+% & \multicolumn{3}{c}{\textsc{CDE}} 
+% & \multicolumn{3}{c}{\textsc{ABMP}} 
+% & \multicolumn{3}{c}{\textsc{BCMQ}} 
+% & \multicolumn{3}{c}{\textsc{BDEQ}} 
+% & \multicolumn{3}{c}{\textsc{HLMPQ}} \\
+% \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+% & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+% & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+% & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+% & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+% & S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ \\
+% \midrule
+
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{General Purpose LLMs}} \\
+% Llama         & 1.3\,/\,0.5 & 0.64 & 19.8
+%               & 1.9\,/\,0.6 & 0.61 & 1.83
+%               & 4.1\,/\,1.2 & 0.60 & 0.38
+%               & 0.7\,/\,0.0 & 0.59 & 8.9
+%               & 2.2\,/\,0.1 & 0.61 & 0.75
+% \\
+% Mistral       & 1.0\,\,0.4 & 0.61 & 17.4
+%               & 0.9\,/\,0.2 & 0.60 & 1.77
+%               & 2.7\,/\,0.6 & 0.59 & 0.31
+%               & 0.1\,/\,0.0 & 0.64 & 11.2
+%               & 0.9\,/\,0.1 & 0.63 & 1.33
+% \\
+% Llama(1-shot) & 2.2\,/\,0.6 & 0.58 & 22.1
+%               & 4.1\,/\,0.5 & 0.62 & 1.66
+%               & 4.9\,/\,2.1 & 0.60 & 0.40
+%               & 2.5\,/\,0.7 & 0.60 & 9.1
+%               & 4.2\,/\,1.4 & 0.59 & 1.21
+% \\
+% Mistral(1-shot) & 3.1\,/,1.2 & 0.64 & 29.7
+%                 & 4.5\,/,0.8 & 0.61 & 2.01
+%                 & 6.8\,/,2.7 & 0.60 & 0.43
+%                 & 3.0\,/,0.9 & 0.61 & 12.5
+%                 & 4.1\,/\,1.3 & 0.63 & 1.57
+% \\
+% GPT-5(1-shot) & 3.4\,/\,0.6 & 0.61 & 21.3
+%               & 5.7\,/\,2.7 & 0.61 & 2.45
+%               & 9.5\,/\,3.7 & 0.62 & 0.42
+%               & 3.1\,/\,0.4 & 0.64 & 13.9
+%               & 6.4\,/\,4.1 & 0.59 & 1.01
+
+% \\
+% GPT-5(2-shot) & 4.6\,/\,1.3 & 0.60 & 33.4 
+%               & 11.2\,/\,4.8 & 0.61 & 2.71
+%               & 10.5\,/\,2.9 & 0.63 & 0.41
+%               & 4.3\,/\,1.7 & 0.58 & 13.7
+%               & 8.0\,/\,3.2 & 0.57 & 1.15
+
+% \\
+
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{RL method}} \\
+% REINVENT-4 & 1.2\,/\,0.1 & 0.61 & 11.6
+%            & 1.8\,/\ 0.2 & 0.63 & 1.30
+%            & 2.3\,/\ 0.7 & 0.62 & 0.41
+%            & 0.5 \,/\ 0.0 & 0.59 & 9.2
+%            & 2.7 \,/\ 1.6 & 0.60 & 0.95
+% \\
+% MolT-5-Large & 0.4\,/\,0.0 & 0.70 & 9.3
+%              & 0.3\,/\,0.0 & 0.64 & 0.99
+%              & 1.1\,/\,0.1 & 0.61 & 0.35
+%              & 0.1\,/\,0.0 & 0.62 & 7.5
+%              & 0.5\,/\,0.2 & 0.60 & 1.12
+% \\ 
+% MolT5-Large & 1.0\,/\,0.2 & 0.59 & 14.2
+%             & 23.0\,/\,8.4 & 0.60 & 1.85
+%             & 17.2\,/\,7.8 & 0.62 & 0.46
+%             & 0.4\,/\,0.2 & 0.70 & 10.17
+%             & 11.4\,/\1.6 & 0.58 & 2.13
+% \\
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{Supervised Fine-Tuning (SFT) Baseline}} \\
+% MolT5-Large-GRPO 
+% & 2.3\,/\,0.4 & 0.63 & 6.99
+% & 41.0\,/\,19.6 & 0.59 & 2.62
+% & 26.0\,/\,10.4 & 0.62 & 0.47
+% & 0.4\,/\,0.1 & 0.59 & 10.93
+% & 26.4\,/\,8.0 & 0.60 & 1.92
+% \\
+% MolT5-Large-GDPO
+% & 2.4\,/\,0.8 & 0.58 & 17.1
+% & 34.8\,/\,16.0 & 0.61 & 2.31
+% & 22.2\,/\,10.0 & 0.61 & 2.51
+% & 0.8\,/\,0.4 & 0.58 & 2.57
+% & 24.0\,/\,4.8 & 0.60 & 1.55
+
+% \\
+% GeLLM$^4$O-C$_{\mathrm{Mistral}}$
+% & 4.8\,/\,1.4 & 0.57 & \textbf{120.1} 
+% & 45.4\,/\,22.8 & \textbf{0.60} & 3.03
+% & 40.8\,/\,18.6 & \underline{0.59} & 0.51
+% & 1.4\,/\,0.2 & \textbf{0.64} & 11.2
+% & 29.6\,/\,5.8 & \underline{0.58} & 1.49 \\
+
+% GeLLM$^4$O-C$_{\mathrm{Llama}}$
+% & 3.0\,/\,0.8 & \underline{0.60} & 18.0
+% & 52.6\,/\,23.2 & 0.56 & 1.79
+% & 38.8\,/\,20.0 & 0.56 & 0.52
+% & 1.4\,/\,0.6 & 0.59 & 10.9
+% & 30.2\,/\,6.4 & 0.54 & 1.31 \\
+
+% \rowcolor{gray!15} \multicolumn{16}{c}{\textit{RL Post-Training (\textsc{C-Moral}, Ours)}} \\
+% GRPO$_{\mathrm{Mistral}}$
+% & \textbf{7.6}\,/\,\textbf{2.6} & 0.58 & 78.7
+% & 71.8\,/\,47.6 & \underline{0.59} & \textbf{3.67}
+% & \underline{57.8}\,/\,\underline{34.2} & \textbf{0.60} & \textbf{0.55}
+% & \textbf{3.4}\,/\,1.2 & \underline{0.63} & 12.7
+% & \textbf{57.0}\,/\,\textbf{18.2} & \textbf{0.59} & \textbf{1.92} \\
+% GDPO$_{\mathrm{Mistral}}$
+% & \underline{6.4}\,/\,\underline{2.4} & 0.57 & \underline{114.1}
+% & 72.6\,/\,45.8 & 0.58 & \underline{3.40}
+% & \textbf{61.0}\,/\,\textbf{34.8} & 0.58 & \textbf{0.55}
+% & 2.8\,/\,1.2 & 0.62 & \underline{15.9}
+% & 48.8\,/\,14.8 & \textbf{0.59} & 1.90
+% \\
+% GRPO$_{\mathrm{Llama}}$
+% & 4.6\,/\,1.8 & \textbf{0.61} & 31.8
+% & \textbf{76.2}\,/\,\textbf{49.8} & \textbf{0.60} & 3.15
+% & 49.8\,/\,28.2 & 0.58 & 0.53
+% & \underline{3.0}\,/\,\textbf{1.6} & \underline{0.63} & 15.1
+% & \underline{52.6}\,/\,\underline{16.8} & \underline{0.58} & \textbf{1.92}
+% \\
+% GDPO$_{\mathrm{Llama}}$
+% & 4.5\,/\,2.0 & 0.59 & 72.4
+% & \underline{73.1}\,/\,\underline{47.7} & 0.58 & 3.24
+% & 53.3\,/\,33.9 & 0.58 & \underline{0.54}
+% & 2.9\,/\,\underline{1.5} & 0.62 & \textbf{17.4}
+% & 44.3\,/\,12.3 & \underline{0.58} & \underline{1.91}
+% \\
+% \bottomrule
+% \end{tabular}
+% }
+% \caption{Detailed performance comparison on OOD tasks. \textsc{C-Moral} consistently improves success rates over SFT baselines while preserving scaffold similarity. Bold denotes the best result in each column, and underlined denotes the second-best.}
+% \label{tab:ood_results}
+% \end{table*}
+
+
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{1.8pt}
+\renewcommand{\arraystretch}{1.18}
+
+\textbf{(a) Detailed OOD performance}
+\vspace{2pt}
+
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}l ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Model}} 
+& \multicolumn{3}{c}{\textsc{Cde}} 
+& \multicolumn{3}{c}{\textsc{Abmp}} 
+& \multicolumn{3}{c}{\textsc{Bcmq}} 
+& \multicolumn{3}{c}{\textsc{Bdeq}} 
+& \multicolumn{3}{c}{\textsc{Hlmpq}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+& S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+& S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+& S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+& S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$
+& S/SS$^{\uparrow}$ & Sim$^{\uparrow}$ & RI$^{\uparrow}$ \\
+\midrule
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+Llama         
+& 1.3\,/\,0.5 & \textbf{0.70} & 19.8
+& 1.9\,/\,0.6 & \textbf{0.67} & 1.83
+& 4.1\,/\,1.2 & \underline{0.66} & 0.38
+& 0.7\,/\,0.0 & \underline{0.68} & 8.9
+& 2.2\,/\,0.1 & \textbf{0.66} & 0.75 \\
+Mistral       
+& 1.0\,/\,0.4 & \underline{0.69} & 17.4
+& 0.9\,/\,0.2 & \textbf{0.67} & 1.77
+& 2.7\,/\,0.6 & \textbf{0.68} & 0.31
+& 0.1\,/\,0.0 & 0.64 & 11.2
+& 0.9\,/\,0.1 & \underline{0.65} & 1.33 \\
+Llama (1-shot) 
+& 2.2\,/\,0.6 & 0.64 & 22.1
+& 4.1\,/\,0.5 & 0.62 & 1.66
+& 4.9\,/\,2.1 & 0.60 & 0.40
+& 2.5\,/\,0.7 & 0.60 & 9.1
+& 4.2\,/\,1.4 & 0.63 & 1.21 \\
+Mistral (1-shot) 
+& 3.1\,/\,1.2 & 0.64 & 29.7
+& 4.5\,/\,0.8 & 0.61 & 2.01
+& 6.8\,/\,2.7 & 0.60 & 0.43
+& 3.0\,/\,0.9 & 0.61 & 12.5
+& 4.1\,/\,1.3 & 0.63 & 1.57 \\
+GPT-5o (1-shot) 
+& 3.4\,/\,0.6 & 0.61 & 21.3
+& 5.7\,/\,2.7 & 0.61 & 2.45
+& 9.5\,/\,3.7 & 0.62 & 0.42
+& 3.1\,/\,0.4 & 0.64 & 13.9
+& 6.4\,/\,4.1 & 0.59 & 1.01 \\
+GPT-5o (2-shot) 
+& 4.6\,/\,1.3 & 0.60 & 33.4 
+& 11.2\,/\,4.8 & 0.61 & 2.71
+& 10.5\,/\,2.9 & 0.63 & 0.41
+& \textbf{4.3}\,/\,\textbf{1.7} & 0.58 & 13.7
+& 8.0\,/\,3.2 & 0.57 & 1.15 \\
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{Expert Models \& SFT Baselines}} \\
+REINVENT-4 
+& 1.2\,/\,0.1 & 0.61 & 11.6
+& 1.8\,/\,0.2 & 0.63 & 1.30
+& 2.3\,/\,0.7 & 0.62 & 0.41
+& 0.5\,/\,0.0 & 0.59 & 9.2
+& 2.7\,/\,1.6 & 0.60 & 0.95 \\
+MolT5-Large (Base) 
+& 0.4\,/\,0.0 & \textbf{0.70} & 9.3
+& 0.3\,/\,0.0 & \underline{0.64} & 0.99
+& 1.1\,/\,0.1 & 0.61 & 0.35
+& 0.1\,/\,0.0 & 0.62 & 7.5
+& 0.5\,/\,0.2 & 0.60 & 1.12 \\
+MolT5-Large (SFT) 
+& 1.0\,/\,0.2 & 0.59 & 14.2
+& 23.0\,/\,8.4 & 0.60 & 1.85
+& 17.2\,/\,7.8 & 0.62 & 0.46
+& 0.4\,/\,0.2 & \textbf{0.70} & 10.17
+& 11.4\,/\,1.6 & 0.58 & \textbf{2.13} \\
+GeLLM$^4$O-C$_{\mathrm{Llama}}$
+& 3.0\,/\,0.8 & 0.60 & 18.0
+& 52.6\,/\,23.2 & 0.56 & 1.79
+& 38.8\,/\,20.0 & 0.56 & 0.52
+& 1.4\,/\,0.6 & 0.59 & 10.9
+& 30.2\,/\,6.4 & 0.54 & 1.31 \\
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$
+& 4.8\,/\,1.4 & 0.57 & \textbf{120.1} 
+& 45.4\,/\,22.8 & 0.60 & 3.03
+& 40.8\,/\,18.6 & 0.59 & 0.51
+& 1.4\,/\,0.2 & 0.64 & 11.2
+& 29.6\,/\,5.8 & 0.58 & 1.49 \\
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{RL Post-Training (\textsc{C-Moral}, Ours)}} \\
+\multicolumn{16}{@{}l}{\textbf{GRPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$
+& 2.3\,/\,0.4 & 0.63 & 6.99
+& 41.0\,/\,19.6 & 0.59 & 2.62
+& 26.0\,/\,10.4 & 0.62 & 0.47
+& 0.4\,/\,0.1 & 0.59 & 10.93
+& 26.4\,/\,8.0 & 0.60 & \underline{1.92} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$
+& 4.6\,/\,1.8 & 0.61 & 31.8
+& \textbf{76.2}\,/\,\textbf{49.8} & 0.60 & 3.15
+& 49.8\,/\,28.2 & 0.58 & 0.53
+& 3.0\,/\,\underline{1.6} & 0.63 & 15.1
+& \underline{52.6}\,/\,\underline{16.8} & 0.58 & \underline{1.92} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$
+& \textbf{7.6}\,/\,\textbf{2.6} & 0.58 & 78.7
+& 71.8\,/\,47.6 & 0.59 & \textbf{3.67}
+& \underline{57.8}\,/\,\underline{34.2} & 0.60 & \underline{0.55}
+& \underline{3.4}\,/\,1.2 & 0.63 & 12.7
+& \textbf{57.0}\,/\,\textbf{18.2} & 0.59 & \underline{1.92} \\
+\addlinespace[3pt]
+
+\multicolumn{16}{@{}l}{\textbf{GDPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$
+& 2.4\,/\,0.8 & 0.58 & 17.1
+& 34.8\,/\,16.0 & 0.61 & 2.31
+& 22.2\,/\,10.0 & 0.61 & \textbf{2.51}
+& 0.8\,/\,0.4 & 0.58 & 2.57
+& 24.0\,/\,4.8 & 0.60 & 1.55 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$
+& 4.5\,/\,2.0 & 0.59 & 72.4
+& \underline{73.1}\,/\,\underline{47.7} & 0.58 & 3.24
+& 53.3\,/\,33.9 & 0.58 & 0.54
+& 2.9\,/\,1.5 & 0.62 & \textbf{17.4}
+& 44.3\,/\,12.3 & 0.58 & 1.91 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$
+& \underline{6.4}\,/\,\underline{2.4} & 0.57 & \underline{114.1}
+& 72.6\,/\,45.8 & 0.58 & \underline{3.40}
+& \textbf{61.0}\,/\,\textbf{34.8} & 0.58 & \underline{0.55}
+& 2.8\,/\,1.2 & 0.62 & \underline{15.9}
+& 48.8\,/\,14.8 & 0.59 & 1.90 \\
+
+\bottomrule
+\end{tabular}
+}
+
+\vspace{6pt}
+
+\textbf{(b) Additional OOD molecular quality metrics}
+\vspace{2pt}
+
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}l ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{\hspace{4pt}} ccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Model}} 
+& \multicolumn{3}{c}{\textsc{Cde}} 
+& \multicolumn{3}{c}{\textsc{Abmp}} 
+& \multicolumn{3}{c}{\textsc{Bcmq}} 
+& \multicolumn{3}{c}{\textsc{Bdeq}} 
+& \multicolumn{3}{c}{\textsc{Hlmpq}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$
+& Val$^{\uparrow}$ & SAS$^{\downarrow}$ & Nov$^{\uparrow}$ \\
+\midrule
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+Llama 
+& 94.40 & 3.31 & 98.52
+& 98.20 & 2.80 & 97.76
+& 98.00 & 2.90 & 100.00
+& 95.60 & 3.26 & 100.00
+& 99.20 & 2.89 & 99.40
+\\
+Mistral
+& 88.40 & 3.03 & 100.00
+& 86.20 & 2.85 & 100.00
+& 88.80 & 2.84 & 100.00
+& 83.60 & 2.96 & 100.00
+& 86.40 & 2.90 & 99.54
+\\
+Llama (1-shot) 
+& 99.40 & 3.41 & 91.55
+& 99.20 & 2.77 & 96.37
+& 99.80 & 2.62 & 88.98
+& 99.60 & 3.19 & 83.33
+& 99.60 & 2.73 & 87.98
+\\
+Mistral (1-shot) 
+& 99.60 & 3.05 & 89.16
+& 99.60 & 2.76 & 94.78
+& 99.60 & 2.70 & 92.77
+& 99.80 & 3.11 & 84.77
+& 99.60 & 2.52 & 90.16
+\\
+GPT-5o (1-shot) 
+& 94.60 & 3.10 & 98.94
+& 93.80 & 2.79 & 98.08
+& 90.00 & 2.68 & 100.00
+& 92.40 & 2.81 & 98.48
+& 93.60 & 2.75 & 98.72
+\\
+GPT-5o (2-shot)
+& 96.20 & 2.97 & 83.37
+& 97.40 & 2.80 & 82.75
+& 97.00 & 2.73 & 77.32
+& 98.20 & 2.77 & 87.63
+& 96.60 & 2.66 & 81.37
+\\
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{Expert Models \& SFT Baselines}} \\
+REINVENT-4
+& 100.00 & 2.93 & 100.00
+& 99.80 & 2.72 & 99.40
+& 100.00 & 3.04 & 99.80
+& 99.60 & 3.23 & 100.00
+& 100.00 & 2.96 & 100.00
+\\
+MolT5-Large (Base) 
+& 99.60 & 2.89 & 99.20
+& 100.00 & 2.76 & 100.00
+& 100.00 & 2.92 & 99.40
+& 99.80 & 2.95 & 98.80
+& 100.00 & 2.84 & 99.40
+\\
+MolT5-Large (SFT)
+& 98.40 & 2.67 & 100.00
+& 98.20 & 2.38 & 98.78
+& 97.40 & 2.68 & 99.59
+& 97.40 & 3.07 & 100.00
+& 96.80 & 2.50 & 99.79 \\
+GeLLM$^4$O-C$_{\mathrm{Llama}}$
+& 99.20 & 2.75 & 99.40
+& 99.80 & 2.32 & 99.20
+& 98.80 & 2.55 & 100.00
+& 97.00 & 2.96 & 98.76
+& 99.60 & 2.32 & 99.40 \\
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$
+& 100.00 & 2.85 & 100.00
+& 99.80 & 2.36 & 99.40
+& 100.00 & 2.60 & 98.80
+& 99.80 & 3.04 & 98.40
+& 99.80 & 2.37 & 99.00 \\
+
+\rowcolor{gray!15} 
+\multicolumn{16}{c}{\textit{RL Post-Training (\textsc{C-Moral}, Ours)}} \\
+\multicolumn{16}{l}{\textbf{GRPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$
+& 97.60 & 2.81 & 100.00
+& 98.40 & 2.61 & 99.39
+& 98.40 & 2.58 & 98.57
+& 98.80 & 2.51 & 99.60
+& 98.00 & 2.53 & 100.00\\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$
+& 100.00 & 2.94 & 99.40
+& 100.00 & 2.75 & 99.80
+& 100.00 & 2.62 & 99.20
+& 99.60 & 2.90 & 100.00
+& 99.80 & 2.45 & 99.60\\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$
+& 100.00 & 2.90 & 99.80
+& 100.00 & 3.13 & 100.00
+& 100.00 & 2.66 & 98.80
+& 100.00 & 2.99 & 99.00
+& 100.00 & 2.50 & 99.40 \\
+\addlinespace[3pt]
+
+\multicolumn{16}{l}{\textbf{GDPO Method}} \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{MolT5}}$
+& 98.40 & 2.80 & 99.19
+& 97.00 & 2.67 & 99.80
+& 98.80 & 2.50 & 100.00
+& 99.00 & 2.50 & 99.00
+& 96.80 & 2.39 & 99.80 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Llama}}$
+& 100.00 & 2.99 & 100.00
+& 100.00 & 2.45 & 99.00
+& 100.00 & 2.51 & 99.60
+& 100.00 & 2.70 & 98.60
+& 100.00 & 2.33 & 99.20 \\
+\hspace{0.3em} \textsc{C-Moral}$_{\mathrm{Mistral}}$
+& 100.00 & 2.76 & 99.40
+& 100.00 & 2.60 & 100.00
+& 100.00 & 2.62 & 100.00
+& 100.00 & 3.05 & 100.00
+& 100.00 & 2.35 & 99.40 \\
+
+\bottomrule
+\end{tabular}
+}
+
+\caption{
+OOD per-task results on C-MuMOInstruct. 
+(a) Detailed performance comparison using S/SS, similarity, and RI. 
+(b) Additional molecular quality metrics, including validity, synthetic accessibility score (SAS), and novelty. 
+Val and Nov are reported in percentages; lower SAS indicates better synthetic accessibility.
+}
+\label{tab:ood_detailed_results}
+\end{table*}
+
+
+\clearpage
+
+\begin{figure*}[t] 
+  \centering
+  \includegraphics[width=\textwidth]{figs/prompt_llm.png} 
+  \caption{
+An example of the structured prompt template used for general-purpose LLM prompting. 
+The prompt includes a domain-specific system instruction, a few-shot molecular editing example, and a test query consisting of a source SMILES and property-wise adjustment targets. 
+The model is instructed to generate only a valid optimized SMILES while preserving the molecular structure as much as possible.
+}
+  \label{fig:prompt_llm}
+\end{figure*}
+
+
+
+\begin{table*}[!htp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.03}
+\begin{tabularx}{\textwidth}{@{}p{0.22\textwidth} X p{0.22\textwidth} p{0.14\textwidth}@{}}
+\toprule
+\textbf{Artifact} & \textbf{Source} & \textbf{License / Terms} & \textbf{Accessibility} \\
+\midrule
+
+C-MuMOInstruct
+& \url{https://huggingface.co/datasets/NingLab/MuMOInstruct}
+& CC BY 4.0
+& Dataset \\
+
+GeLLM$^4$O-C
+& \url{https://github.com/ninglab/GeLLMO-C}
+& Original repository / model terms
+& Checkpoint / code \\
+
+S$^2$-Bench MolOpt
+& \url{https://github.com/phenixace/TOMG-Bench}
+& Original benchmark terms
+& Dataset / benchmark \\
+
+RDKit
+& \url{https://www.rdkit.org/}
+& BSD-style license
+& Open-source toolkit \\
+
+ADMET-AI
+& \url{https://admet.ai.greenstonebio.com/}
+& Original platform / package terms
+& Web interface / package \\
+
+MolT5
+& \url{https://github.com/blender-nlp/MolT5}
+& Original model terms
+& Checkpoint \\
+
+LLaMA
+& \url{https://huggingface.co/meta-llama}
+& LLaMA Community License
+& Checkpoint \\
+
+Mistral
+& \url{https://huggingface.co/mistralai}
+& Apache 2.0
+& Checkpoint \\
+
+GPT-4o / GPT-5o
+& \url{https://openai.com/}
+& Proprietary API terms
+& API \\
+
+Gemini-1.5-Pro
+& \url{https://ai.google.dev/}
+& Proprietary API terms
+& API \\
+
+\bottomrule
+\end{tabularx}
+\caption{Licenses, terms of use, and accessibility of the main artifacts used in this work. We use these artifacts only for research and evaluation purposes and do not redistribute them as part of this submission.}
+\label{tab:artifact_licenses}
+\end{table*}
+
+
+
+
+\end{document}
+
+
+
+
