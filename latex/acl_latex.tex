@@ -644,23 +644,20 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 
 \begin{figure*}[!t]
 \centering
-% The two comparison charts are separate numbered figures, independent of Table 2.
-% Stack the original, visually richer versions at a readable scale.
-\begin{minipage}[t]{0.70\textwidth}
+% Two separate, consistently styled figures shown side by side.
+% The figures are independent of the full-width Table 2.
+\begin{minipage}[t]{0.486\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_sor_original_style.pdf}
+  \includegraphics[width=\linewidth]{figs/cmoral_sor_professional.pdf}
   \vspace{1mm}
-  \captionof{figure}{Average IND/OOD SOR for SFT and the best C-MORAL variant on each backbone. Blue annotations show absolute and relative gains.}
+  \captionof{figure}{Mean SOR for SFT baselines and the best C-MORAL variant on each backbone, averaged across IND/OOD tasks. Blue annotations indicate absolute and relative gains.}
   \label{fig:c-mumo_sor_backbones}
-\end{minipage}
-
-\vspace{4mm}
-
-\begin{minipage}[t]{0.55\textwidth}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.486\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_original_style.pdf}
+  \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_professional.pdf}
   \vspace{1mm}
-  \captionof{figure}{GRPO versus GDPO across IND/OOD settings: criterion satisfaction (SOR) above, relative improvement (RI) below. Crowns mark the higher value.}
+  \captionof{figure}{GRPO versus GDPO across IND/OOD tasks: criterion satisfaction (SOR) and relative improvement (RI).}
   \label{fig:c-mumo_grpo_gdpo}
 \end{minipage}
 \end{figure*}
