@@ -250,12 +250,12 @@ Conversely, for near-optimal properties ($\mathcal{P}_s$), the property must be 
 \end{equation}
 This effective formulation creates a high-reward ``plateau'' within the acceptable range and imposes exponential decay upon any boundary violation.
 \subsection{Reward Aggregation}
-Each $s_p$ denotes a property-level continuous preference score computed from the realized molecular property value $v_p$. After obtaining these property-level scores, we aggregate them using the geometric mean to enforce the simultaneous satisfaction of all constraints. Let $N = |\mathcal{P}_i| + |\mathcal{P}_s|$. The total reward $R_{total}(M_y)$ is:
+Each $s_p$ denotes a property-level continuous preference score computed from the realized molecular property value $v_p$. In the GRPO variant, we combine these scores with a geometric mean to penalize low-scoring constraints before group normalization. Let $N = |\mathcal{P}_i| + |\mathcal{P}_s|$. The scalar GRPO reward $R_{total}(M_y)$ is:
 \begin{equation}
   \label{eq:geometric_mean}
   R_{total}(M_y) = \left( \prod_{p \in \mathcal{P}_i} s^{imp}_p \prod_{q \in \mathcal{P}_s} s^{stab}_q \right)^{\frac{1}{N}}
 \end{equation}
-Unlike an arithmetic mean, geometric aggregation penalizes low-scoring constraints multiplicatively, although it is not identical to taking a minimum. See Appendix~\ref{appendix:aggregation}.
+Unlike an arithmetic mean, geometric aggregation penalizes low-scoring constraints multiplicatively, although it is not identical to taking a minimum. GDPO instead normalizes property-wise feedback across the response group before smooth-min aggregation (Appendix~\ref{appendix:gdpo_implementation}). See Appendix~\ref{appendix:aggregation} for the aggregation trade-offs.
 
 \subsection{GRPO Optimization}
 % % For a given prompt, the policy $\pi_\Theta$ samples a group of $G$ candidates $\mathcal{G} = \{y_1, \dots, y_G\}$. For each $y_i$, we compute its holistic reward $R_i = R_{total}(y_i)$. We then normalize these rewards to compute the relative advantage $A_i$:
@@ -276,11 +276,11 @@ The final \textsc{C-Moral}-GRPO policy follows the same loss $\mathcal{L}_{GRPO}
   \label{eq:grpo_loss}
   \mathcal{L}_{GRPO}(\Theta) \!=\! - \frac{1}{G} \sum_{i=1}^{G}\! \left[ J_i(\Theta) \!-\! \beta \mathbb{D}_{KL}(\pi_\Theta \| \pi_{ref}) \right]
 \end{equation}
-By decoupling the absolute reward magnitude, \textsc{C-Moral}-GRPO inherently preserves structural diversity and circumvents policy peaking. Detailed implementation is provided in Appendix \ref{appendix:grpo_implementation}.
+Group-relative normalization compares candidates generated for the same prompt after their aligned improvement and preservation scores have been combined into one reward. The formulation alone does not guarantee molecular diversity. Detailed implementation is provided in Appendix~\ref{appendix:grpo_implementation}.
 
 \subsection{GDPO Optimization}
 To explicitly disentangle conflicting multi-objective feedback, we propose \textsc{C-Moral}-GDPO. Rather than normalizing a single scalarized reward, GDPO evaluates relative superiority independently for each property across the generated group $\mathcal{G}$. These decoupled, property-specific advantages are then aggregated using a Log-Sum-Exp formulation. 
- \textsc{C-Moral}-GDPO mitigates the risk of ``reward dominance,'' ensuring that easily optimized properties do not overshadow stricter constraints and preventing the implicit sacrifice of critical targets. Detailed mathematical formulations for the decoupled advantage and the aggregated loss are deferred to Appendix \ref{appendix:gdpo_implementation}. Further analysis of the reward aggregation choices is provided in Appendix \ref{appendix:gm_vs_logmin}.
+ \textsc{C-Moral}-GDPO is designed to reduce ``reward dominance'': normalizing each property before smooth-min aggregation gives weaker relative dimensions more influence on the update. Because these are group-relative advantages, this mechanism does not itself guarantee that a candidate meets every absolute property threshold. Detailed formulations are given in Appendix~\ref{appendix:gdpo_implementation}; the aggregation functions are compared in Appendix~\ref{appendix:gm_vs_logmin}.
 
 
 % \section{Experimental Setup}
@@ -770,7 +770,7 @@ MAMO-direct and MAMO-adapted achieve IND SOR of $5.2\%$/$12.4\%$ and OOD SOR of 
 \textsc{C-Moral} also improves the smaller molecule-text model \textsc{MolT5}. Compared with \textsc{MolT5}-Large (SFT), RL post-training increases IND SOR/SSOR from $13.9\%/4.6\%$ to $20.0\%/8.8\%$, and OOD SOR/SSOR from $10.6\%/3.6\%$ to $19.2\%/7.7\%$, while maintaining similarity around $0.60$--$0.61$. Together with the stronger absolute performance of 7B/8B LLMs in Table~\ref{tab:c-mumo_overall}, these results show that \textsc{C-Moral} generalizes across model scales while model capacity remains important for complex controllable molecular editing.
 
 \paragraph{GRPO vs. GDPO.}
-GRPO and GDPO show complementary empirical strengths. GRPO achieves the best OOD SOR/SSOR on both \textsc{Mistral} ($39.5\%/20.8\%$) and \textsc{Llama} ($37.2\%/19.6\%$), suggesting that it is more favorable for strict success optimization under held-out objective combinations. In contrast, GDPO often achieves higher RI while maintaining comparable similarity, reaching RI of $110.4$ on \textsc{Mistral} IND and $110.3$ on \textsc{Llama} IND. These results indicate that GRPO better supports constraint satisfaction, whereas GDPO is more beneficial for property improvement.
+The two variants differ in both normalization order and aggregation (Appendix~\ref{appendix:gm_vs_logmin}). GRPO takes the geometric mean of sigmoid-aligned property scores before normalizing the scalar reward across candidates; a low absolute property score therefore depresses the combined reward before group comparison. GDPO instead normalizes each property across the candidate group and applies a smooth-min to the resulting advantages, emphasizing relatively weak dimensions within that group. This offers a possible explanation for the observed trade-off: GRPO has slightly higher OOD SOR/SSOR on both \textsc{Mistral} ($39.5\%/20.8\%$ versus $38.3\%/19.8\%$) and \textsc{Llama} ($37.2\%/19.6\%$ versus $35.6\%/19.5\%$), whereas GDPO has higher RI in all four LLM IND/OOD comparisons (Table~\ref{tab:c-mumo_overall}). The pattern is not universal: GDPO leads on \textsc{Llama} IND SOR/SSOR ($43.4\%/25.4\%$ versus $40.2\%/20.0\%$). Since normalization and aggregation change together, these aggregate results do not identify which component causes the differences or establish a general advantage for either variant.
 
 \subsection{Results on S$^2$-Bench MolOpt}
 
@@ -879,7 +879,7 @@ For a uniquely lowest-scoring objective, its gradient weight approaches $1$ as $
 The domain of each aggregation function also guides its application:
 \begin{itemize}
     \item \textbf{GRPO ($r_i \in [0, 1]$):} GRPO maps raw properties to positive scores via non-linear reward shaping, perfectly satisfying the strict non-negativity requirement of the GM function.
-    \item \textbf{GDPO ($A_i \in \mathbb{R}$):} GDPO optimizes pairwise advantages, which naturally span negative values. Because the standard real-valued GM is not directly applicable to negative advantages, we use LogMin as a smooth, real-valued, bottleneck-sensitive alternative; other real-valued aggregation choices are also possible.
+    \item \textbf{GDPO ($A_i \in \mathbb{R}$):} GDPO uses group-normalized advantages for each property, which can be negative. Because the standard real-valued GM is not directly applicable to negative advantages, we use LogMin as a smooth, real-valued, bottleneck-sensitive alternative; other real-valued aggregation choices are also possible.
 \end{itemize}
 
 
@@ -1496,7 +1496,7 @@ GDPO & 43.4{\scriptsize$\pm$5.7}
 \end{tabular}
 
 \caption{
-Comparison of RL algorithms under identical non-linear reward aggregation and sigmoid alignment. 
+Comparison of SFT, PPO, and the GRPO/GDPO variants under the same C-MuMOInstruct evaluation protocol. GRPO and GDPO use the same property-score alignment but differ in normalization order and aggregation function.
 We report results on both Mistral-7B and Llama-8B backbones across In-Domain (IND) and Out-of-Domain (OOD) C-MuMOInstruct tasks. 
 The SFT baseline is evaluated once from the fixed checkpoint, while all RL post-training results are averaged over three random seeds and reported as mean $\pm$ standard deviation.
 }
@@ -2503,7 +2503,3 @@ Gemini-1.5-Pro
 
 
 \end{document}
-
-
-
-
