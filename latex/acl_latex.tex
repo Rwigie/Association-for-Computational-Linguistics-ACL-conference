@@ -647,16 +647,16 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 % Separate figures, shown side by side; Table 2 remains an independent table.
 \begin{minipage}[t]{0.486\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_sor_refined.pdf}
+  \includegraphics[width=\linewidth]{figs/cmoral_sor_grayblue_arrows.pdf}
   \vspace{1mm}
-  \captionof{figure}{C-MORAL improves mean SOR across all three backbones (IND and OOD). Relative gains over the SFT baseline are annotated above the bars; numeric labels give the corresponding mean SOR values.}
+  \captionof{figure}{C-MORAL improves mean SOR across all three backbones. Gray and blue bars denote SFT and C-MORAL; curved arrows show the relative percentage gain over SFT.}
   \label{fig:c-mumo_sor_backbones}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.486\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_refined.pdf}
+  \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_tracks_crowns.pdf}
   \vspace{1mm}
-  \captionof{figure}{GRPO and GDPO offer complementary strengths. GRPO attains higher SOR in three of four model/split settings (including both OOD settings), while GDPO attains higher RI in all four. Bars depict the leading margins in metric points.}
+  \captionof{figure}{Complementary strengths of GRPO and GDPO. GRPO leads in three of four SOR comparisons (including both OOD settings), whereas GDPO leads in all four RI comparisons. Gray tracks share a common scale within each metric; colored crowns mark the higher result.}
   \label{fig:c-mumo_grpo_gdpo}
 \end{minipage}
 \end{figure*}
