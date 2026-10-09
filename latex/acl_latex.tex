@@ -53,6 +53,8 @@
 \usepackage{balance}
 \usepackage{subcaption}
 \usepackage{caption}
+% Put double-column figures at the top, including figure-only pages.
+\makeatletter\setlength{\@dblfptop}{0pt}\makeatother
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
@@ -640,16 +642,21 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 \end{table*}
 
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
-\begin{minipage}[t]{0.565\textwidth}
+% The two comparison charts are separate numbered figures, independent of Table 2.
+% Stack the original, visually richer versions at a readable scale.
+\begin{minipage}[t]{0.70\textwidth}
   \centering
   \includegraphics[width=\linewidth]{figs/cmoral_sor_original_style.pdf}
   \vspace{1mm}
   \captionof{figure}{Average IND/OOD SOR for SFT and the best C-MORAL variant on each backbone. Blue annotations show absolute and relative gains.}
   \label{fig:c-mumo_sor_backbones}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.415\textwidth}
+\end{minipage}
+
+\vspace{4mm}
+
+\begin{minipage}[t]{0.55\textwidth}
   \centering
   \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_original_style.pdf}
   \vspace{1mm}
