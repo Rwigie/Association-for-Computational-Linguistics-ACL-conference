@@ -644,21 +644,15 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 
 \begin{figure*}[!t]
 \centering
-% Separate figures, shown side by side; Table 2 remains an independent table.
-\begin{minipage}[t]{0.486\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_sor_grayblue_arrows.pdf}
-  \vspace{1mm}
-  \captionof{figure}{C-MORAL improves mean SOR across all three backbones. Gray and blue bars denote SFT and C-MORAL; curved arrows show the relative percentage gain over SFT.}
-  \label{fig:c-mumo_sor_backbones}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.486\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_tracks_crowns.pdf}
-  \vspace{1mm}
-  \captionof{figure}{Complementary strengths of GRPO and GDPO. GRPO leads in three of four SOR comparisons (including both OOD settings), whereas GDPO leads in all four RI comparisons. Gray tracks share a common scale within each metric; colored crowns mark the higher result.}
-  \label{fig:c-mumo_grpo_gdpo}
-\end{minipage}
+% Joint vector figure: (a) cross-backbone SOR gains and (b) GRPO/GDPO trade-offs.
+% Internal panel labels and shared caption avoid mismatched independent figure floats.
+\includegraphics[width=\textwidth]{figs/cmoral_comparison_combined.pdf}
+\vspace{-2mm}
+\caption{C-MORAL performance comparisons on C-MuMOInstruct.
+(a) Average SOR across IND/OOD tasks for the SFT and best C-MORAL variants on each backbone; arrows show relative gains over SFT.
+(b) GRPO versus GDPO on criterion satisfaction (SOR) and relative improvement (RI) for Mistral and LLaMA across IND/OOD settings.
+Colored crowns mark the higher result. GRPO leads in three of four SOR comparisons (including both OOD settings), whereas GDPO leads in all four RI comparisons.}
+\label{fig:c-mumo_comparison}
 \end{figure*}
 
 
@@ -750,13 +744,13 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 \subsection{Results on C-MuMOInstruct}
 \label{subsec:main_results}
 
-We evaluate \textsc{C-Moral} on C-MuMOInstruct across three backbones: \textsc{Mistral}, \textsc{Llama}, and \textsc{MolT5}. As shown in Table~\ref{tab:c-mumo_overall}, our framework consistently improves controllable multi-objective molecular optimization across different LLMs. Figure~\ref{fig:c-mumo_sor_backbones} summarizes the cross-backbone SOR gains. Detailed per-task results are reported in Appendix~\ref{appendix:complete_exp_results}.
+We evaluate \textsc{C-Moral} on C-MuMOInstruct across three backbones: \textsc{Mistral}, \textsc{Llama}, and \textsc{MolT5}. As shown in Table~\ref{tab:c-mumo_overall}, our framework consistently improves controllable multi-objective molecular optimization across different LLMs. Figure~\ref{fig:c-mumo_comparison}(a) summarizes the cross-backbone SOR gains. Detailed per-task results are reported in Appendix~\ref{appendix:complete_exp_results}.
 
 \paragraph{State-of-the-Art IND Performance.}
-On IND tasks, \textsc{C-Moral} outperforms all compared methods in controllable molecular optimization. As shown in Table~\ref{tab:c-mumo_overall}, it obtains the best SOR of \textbf{$48.9\%$} with \textsc{C-Moral}$_{\mathrm{Mistral}}$ and the best SSOR of \textbf{$25.4\%$} with \textsc{C-Moral}$_{\mathrm{Llama}}$. These gains indicate that our RL framework better satisfies target property improvement and preservation constraints simultaneously. Meanwhile, \textsc{C-Moral} maintains competitive similarity around $0.59$--$0.61$ and strong molecular quality in validity, novelty, and synthetic accessibility, as detailed in Table~\ref{tab:ind_detailed_results}(b), supporting validity and synthetic accessibility, although these metrics cannot rule out optimization artifacts from computational property predictors. The GRPO/GDPO comparison in Figure~\ref{fig:c-mumo_grpo_gdpo} further supports this balanced improvement.
+On IND tasks, \textsc{C-Moral} outperforms all compared methods in controllable molecular optimization. As shown in Table~\ref{tab:c-mumo_overall}, it obtains the best SOR of \textbf{$48.9\%$} with \textsc{C-Moral}$_{\mathrm{Mistral}}$ and the best SSOR of \textbf{$25.4\%$} with \textsc{C-Moral}$_{\mathrm{Llama}}$. These gains indicate that our RL framework better satisfies target property improvement and preservation constraints simultaneously. Meanwhile, \textsc{C-Moral} maintains competitive similarity around $0.59$--$0.61$ and strong molecular quality in validity, novelty, and synthetic accessibility, as detailed in Table~\ref{tab:ind_detailed_results}(b), supporting validity and synthetic accessibility, although these metrics cannot rule out optimization artifacts from computational property predictors. The GRPO/GDPO comparison in Figure~\ref{fig:c-mumo_comparison}(b) further supports this balanced improvement.
 
 \paragraph{Adaptation to Unseen Objective Combinations.}
-The OOD setting evaluates label-free adaptation to held-out objective combinations. As shown in Table~\ref{tab:c-mumo_overall} and Figure~\ref{fig:c-mumo_grpo_gdpo}, GRPO achieves the strongest OOD gains on both LLM backbones. For \textsc{Mistral}, it improves SOR from $24.4\%$ to \textbf{$39.5\%$} ($+61.9\%$) and SSOR from $9.8\%$ to \textbf{$20.8\%$} ($+112.2\%$). For \textsc{Llama}, it improves SOR from $25.2\%$ to \textbf{$37.2\%$} ($+47.6\%$) and SSOR from $10.2\%$ to \textbf{$19.6\%$} ($+92.2\%$). GDPO also remains highly competitive, reaching $38.3\%/19.8\%$ SOR/SSOR on \textsc{Mistral} and $35.6\%/19.5\%$ on \textsc{Llama}. These consistent OOD improvements, together with the molecular quality metrics in Table~\ref{tab:ood_detailed_results}(b), suggest that \textsc{C-Moral} adapts to unseen property combinations while maintaining valid, novel, and synthetically reasonable molecules.
+The OOD setting evaluates label-free adaptation to held-out objective combinations. As shown in Table~\ref{tab:c-mumo_overall} and Figure~\ref{fig:c-mumo_comparison}(b), GRPO achieves the strongest OOD gains on both LLM backbones. For \textsc{Mistral}, it improves SOR from $24.4\%$ to \textbf{$39.5\%$} ($+61.9\%$) and SSOR from $9.8\%$ to \textbf{$20.8\%$} ($+112.2\%$). For \textsc{Llama}, it improves SOR from $25.2\%$ to \textbf{$37.2\%$} ($+47.6\%$) and SSOR from $10.2\%$ to \textbf{$19.6\%$} ($+92.2\%$). GDPO also remains highly competitive, reaching $38.3\%/19.8\%$ SOR/SSOR on \textsc{Mistral} and $35.6\%/19.5\%$ on \textsc{Llama}. These consistent OOD improvements, together with the molecular quality metrics in Table~\ref{tab:ood_detailed_results}(b), suggest that \textsc{C-Moral} adapts to unseen property combinations while maintaining valid, novel, and synthetically reasonable molecules.
 
 \paragraph{Multi-objective baseline and single-candidate inference.}
 MAMO-direct and MAMO-adapted achieve IND SOR of $5.2\%$/$12.4\%$ and OOD SOR of $5.1\%$/$10.7\%$, respectively, compared with $48.9\%$/$39.5\%$ for C-MORAL-GRPO (Mistral). MAMO-adapted uses matching property calculators but does not receive the explicit preservation intervals, so this is not an exactly matched instruction interface (Appendix~\ref{appendix:mamo}). Without oracle-based candidate reranking ($B=1$), Mistral-GRPO still reaches $42.7\%$ IND and $32.5\%$ OOD SOR, above its SFT baseline ($30.8\%$/$23.1\%$), supporting learned-policy gains (Table~\ref{tab:single_candidate}).
