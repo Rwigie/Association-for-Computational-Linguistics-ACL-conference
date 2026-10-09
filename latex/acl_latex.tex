@@ -1,3 +1,4 @@
+\PassOptionsToPackage{table}{xcolor}
 \documentclass[11pt]{article}
 
 % Change "review" to "final" to generate the final (sometimes called camera-ready) version.
@@ -7,9 +8,9 @@
 % Standard package includes
 \usepackage{times}
 \usepackage{latexsym}
-\usepackage{cuted}
+% Keep the standard ACL two-column output routine; no strip environment is used.
 \usepackage{caption}
-\usepackage[table]{xcolor}
+\usepackage{xcolor}
 \usepackage{placeins}
 \usepackage{booktabs}
 \usepackage{tabularx}
@@ -17,7 +18,6 @@
 \usepackage{hyperref}
 \usepackage[normalem]{ulem}
 \usepackage{color}
-\usepackage{xcolor}
 \newcommand{\YS}[1]{\textcolor{blue}{\emph{[YS: #1]}}}
 
 % For proper rendering and hyphenation of words containing Latin characters (including in bib files)
@@ -45,9 +45,9 @@
 \usepackage{tikz}
 \usepackage{booktabs}
 \usepackage{multirow}
-\usepackage[table]{xcolor}
 \usepackage{makecell}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{balance}
@@ -274,7 +274,7 @@ Unlike an arithmetic mean, geometric aggregation penalizes low-scoring constrain
 The final \textsc{C-Moral}-GRPO policy follows the same loss $\mathcal{L}_{GRPO}(\Theta)$ in \cite{shao2024deepseekmathpushinglimitsmathematical}, employing an explicit KL divergence penalty to prevent catastrophic deviation from the reference model $\pi_{ref}$:
 \begin{equation}
   \label{eq:grpo_loss}
-  \mathcal{L}_{GRPO}(\Theta) = - \frac{1}{G} \sum_{i=1}^{G} \left[ J_i(\Theta) - \beta \mathbb{D}_{KL}(\pi_\Theta \| \pi_{ref}) \right]
+  \mathcal{L}_{GRPO}(\Theta) \!=\! - \frac{1}{G} \sum_{i=1}^{G}\! \left[ J_i(\Theta) \!-\! \beta \mathbb{D}_{KL}(\pi_\Theta \| \pi_{ref}) \right]
 \end{equation}
 By decoupling the absolute reward magnitude, \textsc{C-Moral}-GRPO inherently preserves structural diversity and circumvents policy peaking. Detailed implementation is provided in Appendix \ref{appendix:grpo_implementation}.
 
@@ -593,12 +593,13 @@ These results suggest that the value-network-based PPO objective is less effecti
 % \caption{Overall results on In-Domain (IND) and Out-of-Domain (OOD) tasks. (a) Average performance comparison between baselines and \textsc{C-Moral} variants in SOR, SSOR, similarity, and RI. (b) Relative improvements in SOR and SSOR over the baselines. Bold denotes the best result in each column, and underlined denotes the second-best.}
 % \label{tab:overall_summary}
 % \end{table*}
-\makeatletter\setlength{\@dblfptop}{0pt}\makeatother
 \begin{table*}[t]
 \centering
-\vspace{-2pt}
 
-{\fontsize{8.5}{9.2}\selectfont
+{\definecolor{cmoralgroup}{RGB}{235,238,242}
+\definecolor{cmoralband}{RGB}{243,248,252}
+\definecolor{cmoralaccent}{RGB}{221,233,243}
+\fontsize{8.5}{9.2}\selectfont
 \setlength{\tabcolsep}{2.2pt}
 \renewcommand{\arraystretch}{1.13}
 \resizebox{\textwidth}{!}{%
@@ -609,36 +610,36 @@ These results suggest that the value-network-based PPO objective is less effecti
 & \textbf{SOR}$\uparrow$ & \textbf{SSOR}$\uparrow$ & \textbf{Sim}$\uparrow$ & \textbf{RI}$\uparrow$ & \textbf{Val}$\uparrow$ & \textbf{SAS}$\downarrow$ & \textbf{Nov}$\uparrow$
 & \textbf{SOR}$\uparrow$ & \textbf{SSOR}$\uparrow$ & \textbf{Sim}$\uparrow$ & \textbf{RI}$\uparrow$ & \textbf{Val}$\uparrow$ & \textbf{SAS}$\downarrow$ & \textbf{Nov}$\uparrow$ \\
 \midrule
-\rowcolor{gray!10} \multicolumn{15}{@{}l@{}}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
-Llama (0-shot) & 3.0 & 0.8 & \textbf{0.66} & 8.0 & 96.6 & 2.88 & 99.9 & 2.0 & 0.5 & \textbf{0.67} & 6.3 & 97.1 & 3.03 & 99.1 \\
-Mistral (0-shot) & 2.6 & 0.5 & \textbf{0.66} & 7.0 & 86.4 & 2.83 & 99.8 & 1.1 & 0.3 & \textbf{0.67} & 6.4 & 86.7 & 2.92 & 99.9 \\
+\rowcolor{cmoralgroup} \multicolumn{15}{@{}l@{}}{\textit{General Purpose LLMs (Zero- \& Few-Shot)}} \\
+Llama (0-shot) & 3.0 & 0.8 & \textbf{0.66} & 8.0 & 96.6 & 2.88 & \textbf{99.9} & 2.0 & 0.5 & \textbf{0.67} & 6.3 & 97.1 & 3.03 & 99.1 \\
+Mistral (0-shot) & 2.6 & 0.5 & \textbf{0.66} & 7.0 & 86.4 & 2.83 & \underline{99.8} & 1.1 & 0.3 & \textbf{0.67} & 6.4 & 86.7 & 2.92 & \textbf{99.9} \\
 Llama (1-shot) & 4.7 & 1.5 & \underline{0.63} & 9.5 & 99.0 & 2.80 & 97.0 & 3.6 & 1.1 & 0.60 & 6.9 & 99.5 & 2.94 & 89.6 \\
 Mistral (1-shot) & 5.8 & 2.3 & 0.61 & 9.3 & 98.8 & 2.69 & 95.2 & 4.3 & 1.4 & 0.62 & 9.2 & 99.6 & 2.83 & 90.3 \\
 GPT-5o (1-shot) & 6.1 & 1.9 & 0.62 & 9.8 & 91.5 & 2.72 & 98.7 & 5.6 & 2.3 & 0.61 & 7.8 & 92.9 & 2.83 & 98.8 \\
 GPT-5o (2-shot) & 7.8 & 2.9 & 0.62 & 13.5 & 92.9 & 2.73 & 85.5 & 7.7 & 2.8 & 0.60 & 10.3 & 97.1 & 2.79 & 82.5 \\
-\rowcolor{gray!10} \multicolumn{15}{@{}l@{}}{\textit{Expert Models \& SFT Baselines}} \\
-REINVENT-4 & 3.5 & 1.3 & 0.59 & 9.2 & 100.0 & 2.49 & 99.8 & 2.3 & 0.5 & 0.61 & 4.5 & 99.9 & 2.98 & 99.8 \\
+\rowcolor{cmoralgroup} \multicolumn{15}{@{}l@{}}{\textit{Expert Models \& SFT Baselines}} \\
+REINVENT-4 & 3.5 & 1.3 & 0.59 & 9.2 & \textbf{100.0} & 2.49 & \underline{99.8} & 2.3 & 0.5 & 0.61 & 4.5 & \underline{99.9} & 2.98 & \underline{99.8} \\
 MAMO (direct) & 5.2 & 2.1 & 0.53 & 8.6 & -- & -- & -- & 5.1 & 2.5 & 0.49 & 11.3 & -- & -- & -- \\
 MAMO (adapted) & 12.4 & 5.1 & 0.50 & 9.4 & -- & -- & -- & 10.7 & 6.0 & 0.49 & 8.3 & -- & -- & -- \\
-MolT5-Large & 0.9 & 0.3 & 0.62 & 10.9 & 99.4 & 2.61 & 99.8 & 0.5 & 0.1 & \underline{0.63} & 3.9 & 99.9 & 2.87 & 99.4 \\
+MolT5-Large & 0.9 & 0.3 & 0.62 & 10.9 & 99.4 & 2.61 & \underline{99.8} & 0.5 & 0.1 & \underline{0.63} & 3.9 & \underline{99.9} & 2.87 & 99.4 \\
 MolT5-Large (SFT) & 13.9 & 4.6 & 0.62 & 20.3 & 98.7 & 2.50 & 98.3 & 10.6 & 3.6 & 0.62 & 5.8 & 97.6 & 2.66 & 99.6 \\
-GeLLM$^4$O-C$_{\mathrm{Llama}}$ & 30.2 & 13.7 & 0.56 & 61.3 & 90.2 & 2.53 & 98.0 & 25.2 & 10.2 & 0.57 & 6.5 & 98.9 & 2.58 & 99.4 \\
-GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98.6 & 24.4 & 9.8 & 0.60 & \textbf{27.3} & 99.9 & 2.64 & 99.1 \\
-\rowcolor{gray!10} \multicolumn{15}{@{}l@{}}{\textit{RL Post-Training (Ours: \textsc{C-Moral})}} \\
-\multicolumn{15}{@{}l@{}}{\textbf{GRPO Method}} \\
-\hspace{3pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 7.9 & 0.61 & 25.4 & 98.8 & 2.37 & 97.6 & 19.2 & 7.7 & 0.61 & 4.6 & 98.2 & 2.61 & 99.5 \\
-\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 40.2 & 20.0 & 0.58 & 102.6 & 99.8 & 2.43 & 97.4 & 37.2 & 19.6 & 0.60 & 10.5 & 99.9 & 2.73 & 99.6 \\
-\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \textbf{48.9} & \underline{25.1} & 0.59 & 96.1 & 99.9 & 2.46 & 98.2 & \textbf{39.5} & \textbf{20.8} & 0.60 & 19.5 & 100.0 & 2.84 & 99.4 \\
-\multicolumn{15}{@{}l@{}}{\textbf{GDPO Method}} \\
-\hspace{3pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 8.8 & 0.60 & 49.1 & 98.5 & 2.39 & 99.1 & 16.8 & 6.4 & 0.60 & 5.2 & 98.0 & 2.57 & 99.6 \\
-\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 43.4 & \textbf{25.4} & 0.57 & \underline{110.3} & 100.0 & 2.40 & 99.0 & 35.6 & 19.5 & 0.59 & 19.1 & 100.0 & 2.60 & 99.3 \\
-\hspace{3pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \underline{47.0} & 24.9 & 0.59 & \textbf{110.4} & 99.9 & 2.40 & 98.6 & \underline{38.3} & \underline{19.8} & 0.59 & \underline{27.2} & 100.0 & 2.68 & 99.8 \\
+GeLLM$^4$O-C$_{\mathrm{Llama}}$ & 30.2 & 13.7 & 0.56 & 61.3 & 90.2 & 2.53 & 98.0 & 25.2 & 10.2 & 0.57 & 6.5 & 98.9 & \underline{2.58} & 99.4 \\
+GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98.6 & 24.4 & 9.8 & 0.60 & \textbf{27.3} & \underline{99.9} & 2.64 & 99.1 \\
+\rowcolor{cmoralaccent} \multicolumn{15}{@{}l@{}}{\textit{RL Post-Training (Ours: \textsc{C-Moral})}} \\
+\rowcolor{cmoralband} \multicolumn{15}{@{}l@{}}{\textbf{GRPO}} \\
+\rowcolor{cmoralband} \hspace{3pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 7.9 & 0.61 & 25.4 & 98.8 & \textbf{2.37} & 97.6 & 19.2 & 7.7 & 0.61 & 4.6 & 98.2 & 2.61 & 99.5 \\
+\rowcolor{cmoralband} \hspace{3pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 40.2 & 20.0 & 0.58 & 102.6 & 99.8 & 2.43 & 97.4 & 37.2 & 19.6 & 0.60 & 10.5 & \underline{99.9} & 2.73 & 99.6 \\
+\rowcolor{cmoralband} \hspace{3pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \textbf{48.9} & \underline{25.1} & 0.59 & 96.1 & \underline{99.9} & 2.46 & 98.2 & \textbf{39.5} & \textbf{20.8} & 0.60 & 19.5 & \textbf{100.0} & 2.84 & 99.4 \\
+\rowcolor{cmoralband} \multicolumn{15}{@{}l@{}}{\textbf{GDPO}} \\
+\rowcolor{cmoralband} \hspace{3pt}\textsc{C-Moral}$_{\mathrm{MolT5}}$ & 20.0 & 8.8 & 0.60 & 49.1 & 98.5 & \underline{2.39} & 99.1 & 16.8 & 6.4 & 0.60 & 5.2 & 98.0 & \textbf{2.57} & 99.6 \\
+\rowcolor{cmoralband} \hspace{3pt}\textsc{C-Moral}$_{\mathrm{Llama}}$ & 43.4 & \textbf{25.4} & 0.57 & \underline{110.3} & \textbf{100.0} & 2.40 & 99.0 & 35.6 & 19.5 & 0.59 & 19.1 & \textbf{100.0} & 2.60 & 99.3 \\
+\rowcolor{cmoralband} \hspace{3pt}\textsc{C-Moral}$_{\mathrm{Mistral}}$ & \underline{47.0} & 24.9 & 0.59 & \textbf{110.4} & \underline{99.9} & 2.40 & 98.6 & \underline{38.3} & \underline{19.8} & 0.59 & \underline{27.2} & \textbf{100.0} & 2.68 & \underline{99.8} \\
 \bottomrule
 \end{tabular}%
 }
 }
 \vspace{1mm}
-\caption{Overall performance on C-MuMOInstruct for in-domain (IND) and out-of-domain (OOD) tasks. Val and Nov are percentages; lower SAS indicates better synthetic accessibility. Quality metrics (Val, SAS, Nov) are unweighted means across the five tasks per split (Tables~\ref{tab:ind_detailed_results} and~\ref{tab:ood_detailed_results}); ``--'' denotes unreported results. RL SOR/SSOR/Sim/RI values average three random seeds at beam size 20.}
+\caption{Overall performance on C-MuMOInstruct for in-domain (IND) and out-of-domain (OOD) tasks. \textbf{Bold} and \underline{underlined} values denote the best and second-best distinct values in each column, including ties at the displayed precision. Val and Nov are percentages; lower SAS indicates better synthetic accessibility. Quality metrics (Val, SAS, Nov) are unweighted means across the five tasks per split (Tables~\ref{tab:ind_detailed_results} and~\ref{tab:ood_detailed_results}); ``--'' denotes unreported results. RL SOR/SSOR/Sim/RI values average three random seeds at beam size 20.}
 \label{tab:c-mumo_overall}
 \end{table*}
 
@@ -815,8 +816,7 @@ Although \textsc{C-Moral} shows strong performance on C-MuMOInstruct and S$^2$-B
 
 % Bibliography entries for the entire Anthology, followed by custom entries
 %\bibliography{anthology,custom}
-% Custom bibliography entries only
-\clearpage
+% Let references follow the text without forcing a partly empty page.
 \bibliography{custom}
 
 \clearpage
@@ -1214,7 +1214,10 @@ We use the property-specific improvement and preservation margins $\Delta_p$ def
 
 For each property $p \in \mathcal{P}_{sub}$, let $d_p \in \{+1,-1\}$ denote the improvement direction defined in Section~3.1. A candidate satisfies the improvement constraints only if every property meets its corresponding margin:
 \[
-    C_{sub}^{(i)} = \prod_{p \in \mathcal{P}_{sub}} \mathbb{I}\left( d_p \bigl(p(M_{gen}^{(i)}) - p(M_{src}^{(i)})\bigr) \geq \Delta_p \right).
+    \begin{aligned}
+    C_{sub}^{(i)} &= \prod_{p \in \mathcal{P}_{sub}} \mathbb{I}\Bigl( \\
+    &\quad d_p \bigl(p(M_{gen}^{(i)}) - p(M_{src}^{(i)})\bigr) \geq \Delta_p \Bigr).
+    \end{aligned}
 \]
 
 For each property $q \in \mathcal{P}_{con}$, we require the generated molecule to remain within a tolerance band around the source hit:
@@ -1681,14 +1684,14 @@ For token $t$ in response $y_{i,j}$, define the importance ratio as
 The GDPO objective is
 \[
 \begin{aligned}
-\mathcal{L}_{\mathrm{GDPO}}(\Theta)
-&=
+&\mathcal{L}_{\mathrm{GDPO}}(\Theta)
+=
 \frac{1}{B} \sum_{i=1}^{B}
 \frac{1}{G} \sum_{j=1}^{G}
-\frac{1}{|y_{i,j}|} \sum_{t=1}^{|y_{i,j}|}
-\min\!\Bigl(
+\frac{1}{|y_{i,j}|} \sum_{t=1}^{|y_{i,j}|} \\
+&\quad\min\!\Bigl(
 \rho_{i,j,t}(\Theta)\,\hat{A}_{i,j}, \\
-&\qquad\qquad
+&\qquad
 \mathrm{clip}\bigl(
 \rho_{i,j,t}(\Theta),\, 1-\epsilon_{\mathrm{clip}},\, 1+\epsilon_{\mathrm{clip}}
 \bigr)\hat{A}_{i,j}
