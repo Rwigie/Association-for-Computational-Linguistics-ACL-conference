@@ -646,23 +646,23 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 
 \begin{figure*}[!t]
 \centering
-% Two separate vector PDFs. LaTeX subcaption generates (a)/(b), not the graphics.
+% Compact Figure 3: preserve both vector panels at their original widths.
+% Crop only the symmetric white outer margins (same trim for aligned heights).
+\captionsetup[subfigure]{skip=1pt}
 \begin{subfigure}[t]{0.44\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_backbone_sor_panel.pdf}
+  \includegraphics[width=\linewidth,trim=0bp 8bp 0bp 12bp,clip]{figs/cmoral_backbone_sor_panel.pdf}
   \caption{}
   \label{fig:c-mumo_sor_panel}
 \end{subfigure}\hfill
 \begin{subfigure}[t]{0.54\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_panel.pdf}
+  \includegraphics[width=\linewidth,trim=0bp 8bp 0bp 12bp,clip]{figs/cmoral_grpo_gdpo_panel.pdf}
   \caption{}
   \label{fig:c-mumo_grpo_gdpo_panel}
 \end{subfigure}
-\vspace{-1mm}
-\caption{C-MORAL performance comparisons on C-MuMOInstruct.
-(a) Mean SOR for SFT and the best C-MORAL variant across three backbones, with curved arrows denoting relative gains.
-(b) GRPO versus GDPO on criterion satisfaction (SOR) and relative improvement (RI). GRPO leads in three of four SOR comparisons (including both OOD settings), while GDPO leads in all four RI comparisons. Blue and orange crowns mark the winning method.}
+\vspace{-2mm}
+\caption{C-MORAL on C-MuMOInstruct. (a) Mean SOR of SFT and the best C-MORAL variants; arrows show relative gains. (b) GRPO versus GDPO on criterion satisfaction (SOR) and relative improvement (RI); colored crowns indicate the higher score.}
 \label{fig:c-mumo_comparison}
 \end{figure*}
 
