@@ -1,0 +1,59 @@
+{
+  "provenance": "SMILES recovered from prior naacl-revision case study table, metrics from qualitative_case_studies.tex; greedy single-candidate outputs",
+  "cases": [
+    {
+      "id": "abmp208",
+      "title": "ABMP molecular optimization",
+      "backbone": "Mistral-7B",
+      "source": {
+        "smiles": "CCOc1ccc(NC(=O)CSc2nc3c(-c4ccccc4)c[nH]c3c(=O)n2CC)cc1",
+        "metrics": {
+          "AMP": 0.8026,
+          "BBBP": 0.4084
+        }
+      },
+      "candidates": [
+        {
+          "name": "GeLLM4O-C (SFT)",
+          "smiles": "CCOc1ccc(NC(=O)CSc2nc3c(C)c[nH]c3c(=O)n2CC)cc1",
+          "metrics": {
+            "AMP": 0.9099,
+            "BBBP": 0.5551
+          },
+          "SOR": 1,
+          "SSOR": 0
+        },
+        {
+          "name": "C-MORAL-GRPO",
+          "smiles": "CCOc1ccc(NC(=O)CSc2nc3c(C(C)(C)C(C)(C)C)c[nH]c3c(=O)n2CC)cc1",
+          "metrics": {
+            "AMP": 0.9117,
+            "BBBP": 0.5737,
+            "MUTAG": 0.0821,
+            "Sim": 0.7246
+          },
+          "SOR": 1,
+          "SSOR": 0
+        },
+        {
+          "name": "C-MORAL-GDPO",
+          "smiles": "CCOc1ccc(NC(=O)CSc2nc3cccc(C(C)(C)C)c3c(=O)n2CC)cc1",
+          "metrics": {
+            "AMP": 0.9413,
+            "BBBP": 0.6891,
+            "MUTAG": 0.1343,
+            "Sim": 0.56
+          },
+          "SOR": 1,
+          "SSOR": 0
+        }
+      ]
+    }
+  ],
+  "pending_case_structures": [
+    "bcmq19",
+    "acep127",
+    "abmp18",
+    "abmp417"
+  ]
+}
