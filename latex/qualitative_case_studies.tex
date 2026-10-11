@@ -1,99 +1,131 @@
-% Concise, audited case studies; single greedy candidate per method.
-\subsection{Representative GRPO--GDPO Case Studies}
+% Carefully selected single-candidate examples: diagnostic, not aggregate.
+\subsection{Qualitative Trade-offs and Failure Analysis}
 \label{appendix:case_diagnostics}
 
 \paragraph{Protocol.}
-We select five contrasting examples from the C-MuMOInstruct
-\texttt{test} split (\texttt{instr\_setting=seen}), comparing the
-GeLLM$^4$O-C base checkpoint with GRPO/GDPO for Mistral and Llama,
-and SFT with GRPO/GDPO for MolT5. Unlike the main beam-20 benchmark,
-these examples use \emph{one greedily decoded candidate}
-(Mistral/Llama seed 42; MolT5 seed not recorded).
-SOR/SSOR and property pass/fail decisions were recalculated using
-the test calculators and source-conditional $\Delta_p$ rules.
-ADMET values are predictions, not experimental measurements.
-Tanimoto similarity uses Morgan radius-2/2048-bit fingerprints,
-without a hard similarity cutoff. The cases are deliberately
-selected rather than representative of the full test distribution.
+We analyze five examples from the C-MuMOInstruct \texttt{test}
+split (\texttt{instr\_setting=seen}), comparing GeLLM$^4$O-C
+(SFT), GRPO, and GDPO on Mistral, with one additional MolT5
+SFT/GRPO/GDPO example. These are \emph{single greedy-candidate}
+outputs, not the main beam-20 evaluation; Mistral uses seed 42,
+while the MolT5 generation seed was not recorded.
+Success and property-level pass/fail status were recomputed
+using the benchmark property calculators and source-dependent
+$\Delta_p$ rules. ADMET results are predictions, not
+experimental observations. Structural similarity is Morgan
+radius-2, 2048-bit Tanimoto; no hard similarity constraint
+is enforced in this evaluation. Cases are selected to expose
+contrasting mechanisms, not to estimate their prevalence.
 
 \begin{table*}[t]
 \centering\footnotesize
-\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.13}
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.12}
 \begin{tabularx}{\textwidth}{@{}llcccX@{}}
 \toprule
 \textbf{Case} & \textbf{Backbone} & \textbf{Base} &
-\textbf{GRPO} & \textbf{GDPO} & \textbf{Interpretation}\\
+\textbf{GRPO} & \textbf{GDPO} & \textbf{Key observation}\\
 \midrule
 BCMQ \#19 & Mistral & 0/0 & \textbf{1/1} & 0/0 &
-GRPO succeeds; GDPO violates CARC and MUTAG preservation.\\
+GDPO violates CARC/MUTAG preservation; GRPO satisfies all criteria.\\
 ACEP \#127 & Mistral & 0/0 & 0/0 & \textbf{1/1} &
-Only GDPO achieves the required CARC reduction.\\
-BCMQ \#333 & Llama & 0/0 & \textbf{1/1} & \textbf{1/1} &
-Both succeed with different molecules (similarity 0.4898 vs.\ 0.3529).\\
+GDPO clears the CARC improvement margin missed by GRPO.\\
+ABMP \#208 & Mistral & 1/0 & 1/0 & 1/0 &
+Both pass SOR with distinct molecules; GDPO gains more AMP/BBBP,
+GRPO has lower MUTAG and higher similarity.\\
 ABMP \#18 & Mistral & 0/0 & 0/0 & 0/0 &
-GRPO misses MUTAG improvement; GDPO breaks BBBP preservation.\\
+GRPO misses the MUTAG improvement threshold; GDPO degrades BBBP.\\
 ABMP \#417 & MolT5 & 0/0 & 0/0 & \textbf{1/1} &
-GDPO succeeds on scored properties despite similarity of 0.0476.\\
+GDPO passes property criteria but severely changes the scaffold.\\
 \bottomrule
 \end{tabularx}
-\caption{Selected single-candidate outcomes (SOR/SSOR; 1 = success).
-Base refers to GeLLM$^4$O-C for Mistral/Llama and SFT for MolT5.
-These examples are not the main beam-20 benchmark results.}
+\caption{Five selected cases under single-candidate decoding.
+Entries indicate SOR/SSOR (1 = success); Base is GeLLM$^4$O-C
+for Mistral and SFT for MolT5.}
 \label{tab:case_diagnostic_overview}
 \end{table*}
 
-\paragraph{Opposite outcomes arise from different bottlenecks.}
+\paragraph{Constraint satisfaction versus stronger targeted gains.}
 In \textbf{BCMQ \#19 (Mistral)}, GRPO satisfies all criteria,
-but GDPO raises predicted CARC from 0.1345 to 0.4112 and
-MUTAG from 0.1462 to 0.2612, violating preservation
-tolerances of 0.2 and 0.1, respectively; GRPO instead
-predicts CARC=0.0186 and MUTAG=0.0768.
-Conversely, in \textbf{ACEP \#127}, decreasing CARC from
-0.3452 requires a score at most 0.1452 ($\Delta=0.2$).
-The base (0.2071) and GRPO (0.1636) do not meet this
-criterion, whereas GDPO reaches 0.0615. The GDPO
-output changes the local carbonyl-linked cyclopropyl
-substituent relative to the other candidates.
-These differences establish which scored criterion
-is decisive, not a causal chemical mechanism.
+whereas GDPO increases predicted CARC from 0.1345 to 0.4112
+and MUTAG from 0.1462 to 0.2612; these exceed the
+allowed preservation degradations of 0.2 and 0.1,
+respectively. GRPO predicts CARC=0.0186 and MUTAG=0.0768,
+preserving both constraints. Conversely, in
+\textbf{ACEP \#127}, the source CARC=0.3452 requires
+a decrease of at least 0.2, to at most 0.1452.
+The baseline (0.2071) and GRPO (0.1636) fall short,
+but GDPO attains 0.0615 and succeeds. Thus,
+joint satisfaction can depend on preserving a weak
+dimension or making enough progress on a still-failing
+target; neither variant uniformly resolves both.
 
-\paragraph{Different molecules can both satisfy strict success.}
-In \textbf{BCMQ \#333 (Llama)}, GRPO and GDPO both
-achieve SOR=SSOR=1 but yield different valid SMILES
+\paragraph{Both succeed, with different optimization emphases.}
+The \textbf{ABMP \#208 (Mistral)} input is especially
+informative because the base, GRPO, and GDPO candidates
+all satisfy SOR (but not SSOR), yet the two RL variants
+generate different molecules
 (Table~\ref{tab:case_smiles_diagnostic}).
-The corresponding input-to-output Tanimoto similarities
-are 0.4898 and 0.3529, respectively.
-Identical binary outcomes therefore need not indicate
-equivalent molecular edits or scaffold preservation.
+GDPO produces larger predicted gains in AMP
+(0.8026 to 0.9413 versus 0.9117 under GRPO)
+and BBBP (0.4084 to 0.6891 versus 0.5737).
+GRPO, however, achieves a lower predicted MUTAG
+(0.0821 versus 0.1343) and retains more of the
+source structure (Tanimoto 0.7246 versus 0.5600).
+All four source-conditioned criteria pass for both
+models. This observation is consistent with the
+aggregate distinction between stronger joint-criterion
+satisfaction under GRPO and larger relative property
+improvements under GDPO, but a single example does not
+establish a general algorithmic preference.
 
-\paragraph{Different failures and a structural limitation.}
-In \textbf{ABMP \#18 (Mistral)}, both candidates are valid
-but fail for different reasons: GRPO reduces MUTAG from
-0.3387 to 0.2728, missing the required 0.1 reduction,
-whereas GDPO reduces MUTAG to 0.0504 but degrades BBBP
-from 0.9099 to 0.6743, exceeding the allowed 0.1 loss.
-In \textbf{ABMP \#417 (MolT5)}, GDPO attains
-SOR=SSOR=1 but generates a heavily alkyl-substituted
-benzene with Tanimoto similarity only 0.0476 to the
-multi-ring source. This illustrates that success on
-scored properties does not guarantee meaningful
-structural conservation or experimental utility.
+\paragraph{Why do the models fail?}
+In \textbf{ABMP \#18 (Mistral)}, both candidate SMILES
+are valid yet both fail SOR for different reasons.
+GRPO lowers MUTAG from 0.3387 to 0.2728, an improvement
+of only 0.0659 versus the required 0.1 decrease.
+GDPO lowers MUTAG much further to 0.0504, but
+also reduces BBBP from 0.9099 to 0.6743,
+exceeding the maximum allowed 0.1 degradation.
+This illustrates a trade-off between aggressive
+target-property optimization and protecting a
+preservation constraint. It is not evidence of a
+universal tendency on every input.
+
+\paragraph{Structural drift despite successful scoring.}
+In \textbf{ABMP \#417 (MolT5)}, GDPO reaches SOR=SSOR=1,
+with predicted AMP=0.9988, BBBP=0.9540,
+MUTAG=0.0005, and PlogP=4.0041, but produces
+a substituted benzene with Tanimoto similarity of
+only 0.0476 to the multi-ring, heteroatom-rich source.
+Here, the scoring criteria succeed while scaffold
+preservation is poor, exposing a limitation of
+property-only threshold evaluation, not experimentally
+validated drug quality.
 
 \begin{table*}[t]
 \centering\footnotesize
-\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.13}
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.10}
 \begin{tabularx}{\textwidth}{@{}llcX@{}}
 \toprule
-\textbf{Case} & \textbf{Output} & \textbf{SOR/SSOR} &
-\textbf{SMILES}\\
+\textbf{Case} & \textbf{Candidate} & \textbf{SOR/SSOR} &
+\textbf{Full generated SMILES}\\
 \midrule
-\multirow{3}{*}{BCMQ \#333 (Llama)}
-& Source & --- & \nolinkurl{c1ccc([C@H](CCNCc2ccco2)c2ccco2)cc1}\\
-& GRPO & 1/1 & \nolinkurl{c1ccc([C@H](CCNC2CCN(C)CC2)c2ccco2)cc1}\\
-& GDPO & 1/1 & \nolinkurl{CC(C)CNC1CC([C@H](c2ccccc2)c2ccco2)C1}\\
+\multirow{4}{*}{ABMP \#208}
+& Source & --- & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3c(-c4ccccc4)c[nH]c3c(=O)n2CC)cc1}\\
+& GeLLM$^4$O-C & 1/0 & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3c(C)c[nH]c3c(=O)n2CC)cc1}\\
+& GRPO & 1/0 & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3c(C(C)(C)C(C)(C)C)c[nH]c3c(=O)n2CC)cc1}\\
+& GDPO & 1/0 & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3cccc(C(C)(C)C)c3c(=O)n2CC)cc1}\\
 \bottomrule
 \end{tabularx}
-\caption{Distinct GRPO and GDPO products satisfying all scored
-property constraints for the same input.}
+\caption{One source with two structurally distinct SOR-successful
+outputs and different property improvements.}
 \label{tab:case_smiles_diagnostic}
 \end{table*}
+
+\paragraph{Takeaway.}
+The cases identify concrete failure mechanisms---insufficient
+improvement on a required property, violation of a preserved
+property, and substantial structure changes despite scored success.
+They also show that equal SOR can hide different molecular edits
+and property-level improvements. Such diagnostic observations
+complement, but do not replace, the aggregate benchmark evidence.
