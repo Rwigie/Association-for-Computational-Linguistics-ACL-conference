@@ -66,7 +66,7 @@ The \textbf{ABMP \#208 (Mistral)} input is especially
 informative because the base, GRPO, and GDPO candidates
 all satisfy SOR (but not SSOR), yet the two RL variants
 generate different molecules
-(Table~\ref{tab:case_smiles_diagnostic}).
+(see the corresponding molecular structure comparison).
 The baseline predicts AMP=0.9099 and BBBP=0.5551.
 GDPO produces larger predicted gains in AMP
 (0.8026 to 0.9413 versus 0.9117 under GRPO)
@@ -107,25 +107,61 @@ preservation is poor, exposing a limitation of
 property-only threshold evaluation, not experimentally
 validated drug quality.
 
-\begin{table*}[t]
-\centering\footnotesize
-\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.10}
-\begin{tabularx}{\textwidth}{@{}llcX@{}}
-\toprule
-\textbf{Case} & \textbf{Candidate} & \textbf{SOR/SSOR} &
-\textbf{Full generated SMILES}\\
-\midrule
-\multirow{4}{*}{ABMP \#208}
-& Source & --- & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3c(-c4ccccc4)c[nH]c3c(=O)n2CC)cc1}\\
-& GeLLM$^4$O-C & 1/0 & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3c(C)c[nH]c3c(=O)n2CC)cc1}\\
-& GRPO & 1/0 & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3c(C(C)(C)C(C)(C)C)c[nH]c3c(=O)n2CC)cc1}\\
-& GDPO & 1/0 & \nolinkurl{CCOc1ccc(NC(=O)CSc2nc3cccc(C(C)(C)C)c3c(=O)n2CC)cc1}\\
-\bottomrule
-\end{tabularx}
-\caption{One source with two structurally distinct SOR-successful
-outputs and different property improvements.}
-\label{tab:case_smiles_diagnostic}
-\end{table*}
+\paragraph{Molecular structure comparisons.}
+The companion molecular figures (when the supplied PDF assets
+are present) visualize
+the corresponding \emph{RDKit-depicted} source and generated
+molecules. The green/red per-property numbers indicate whether
+each source-conditional constraint passes/fails; the displayed
+success outcomes refer to the greedy single-candidate audit,
+not the 20-beam aggregate evaluation. These molecular
+illustrations complement the property-level discussion above.
+
+\IfFileExists{figs/cmoral_case_bcmq19.pdf}{%
+\begin{figure*}[!tp]
+\centering
+\includegraphics[width=0.92\textwidth]{figs/cmoral_case_bcmq19.pdf}
+\caption{Example of successful joint constraint satisfaction on BCMQ (Mistral). The base model and GDPO violate property criteria, whereas GRPO satisfies the preservation and improvement requirements.}
+\label{fig:case_bcmq19}
+\end{figure*}
+}{}
+
+\IfFileExists{figs/cmoral_case_acep127.pdf}{%
+\begin{figure*}[!tp]
+\centering
+\includegraphics[width=0.92\textwidth]{figs/cmoral_case_acep127.pdf}
+\caption{Example of a decisive optimization bottleneck on ACEP (Mistral). GDPO meets the required carcinogenicity reduction, whereas the other two valid outputs fall short.}
+\label{fig:case_acep127}
+\end{figure*}
+}{}
+
+\IfFileExists{figs/cmoral_case_abmp208.pdf}{%
+\begin{figure*}[!tp]
+\centering
+\includegraphics[width=0.92\textwidth]{figs/cmoral_case_abmp208.pdf}
+\caption{Two distinct SOR-successful optimization outcomes on ABMP (Mistral). GDPO produces larger AMP/BBBP gains, while GRPO achieves lower MUTAG and higher input similarity.}
+\label{fig:case_abmp208}
+\end{figure*}
+}{}
+
+\IfFileExists{figs/cmoral_case_abmp18.pdf}{%
+\begin{figure*}[!tp]
+\centering
+\includegraphics[width=0.92\textwidth]{figs/cmoral_case_abmp18.pdf}
+\caption{Two different failure mechanisms on ABMP (Mistral). GRPO fails the required MUTAG reduction; GDPO achieves MUTAG improvement but violates the BBBP preservation constraint.}
+\label{fig:case_abmp18}
+\end{figure*}
+}{}
+
+\IfFileExists{figs/cmoral_case_abmp417.pdf}{%
+\begin{figure*}[!tp]
+\centering
+\includegraphics[width=0.92\textwidth]{figs/cmoral_case_abmp417.pdf}
+\caption{A MolT5 structural-drift limitation: GDPO meets all computed property constraints, but the molecule differs strongly from the source (Tanimoto 0.0476).}
+\label{fig:case_abmp417}
+\end{figure*}
+}{}
+
 
 \paragraph{Takeaway.}
 The cases identify concrete failure mechanisms---insufficient
