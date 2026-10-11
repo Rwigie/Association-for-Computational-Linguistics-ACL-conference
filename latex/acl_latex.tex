@@ -646,27 +646,30 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 
 \begin{figure*}[!t]
 \centering
-% Original Figure 3(a) kept intact; Figure 3(b) uses vector data for all three backbones.
-% No trim/clip: preserve legends, axes, and all labels.
 \captionsetup[subfigure]{skip=1pt}
-\begin{subfigure}[t]{0.30\textwidth}
-  \vspace{0pt}
-  \centering
-  \includegraphics[width=\linewidth]{figs/cmoral_backbone_sor_panel.pdf}
-  \caption{}
-  \label{fig:c-mumo_sor_panel}
+\begin{subfigure}[t]{0.29\textwidth}
+  \vspace{0pt}\centering
+  % PDF supplied separately; existing vector source remains the fallback.
+  \IfFileExists{figs/cmoral_figure3a_final.pdf}{%
+    \includegraphics[width=\linewidth]{figs/cmoral_figure3a_final.pdf}%
+  }{%
+    \includegraphics[width=\linewidth]{figs/cmoral_backbone_sor_panel.pdf}%
+  }
+  \caption{}\label{fig:c-mumo_sor_panel}
 \end{subfigure}\hfill
-\begin{subfigure}[t]{0.68\textwidth}
-  \vspace{0pt}
-  \centering
-  \resizebox{\linewidth}{!}{\input{figs/cmoral_grpo_gdpo_three_backbones.tex}}
-  \caption{}
-  \label{fig:c-mumo_grpo_gdpo_panel}
+\begin{subfigure}[t]{0.69\textwidth}
+  \vspace{0pt}\centering
+  \IfFileExists{figs/cmoral_figure3b_final.pdf}{%
+    \includegraphics[width=\linewidth]{figs/cmoral_figure3b_final.pdf}%
+  }{%
+    \resizebox{\linewidth}{!}{\input{figs/cmoral_grpo_gdpo_three_backbones.tex}}%
+  }
+  \caption{}\label{fig:c-mumo_grpo_gdpo_panel}
 \end{subfigure}
-\vspace{-1.5mm}
+\vspace{-1mm}
 \caption{C-MORAL on C-MuMOInstruct.
-(a) Mean SOR of SFT versus the strongest C-MORAL variant for MolT5, Llama, and Mistral.
-(b) GRPO versus GDPO across IND/OOD tasks: GRPO achieves higher SOR in all three OOD comparisons, while GDPO has higher RI in all six comparisons.}
+(a) Mean SOR gains over SFT across three backbones.
+(b) GRPO and GDPO on IND/OOD objectives: GRPO leads OOD SOR for all three backbones, whereas GDPO leads RI in all six comparisons.}
 \label{fig:c-mumo_comparison}
 \end{figure*}
 
