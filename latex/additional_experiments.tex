@@ -6,23 +6,34 @@ The sigmoid alignment uses $\alpha_p=k/\Delta_p$, with $k=5$ by default. Table~\
 
 \begin{table}[t]
 \centering
-\caption{Sensitivity to sigmoid scale $k$ for Mistral GRPO.}
+\caption{Effect of the sigmoid scaling factor $k$ on \textsc{C-Moral}-GRPO with Mistral-7B. Higher is better for SOR, SSOR, Sim, and RI. Best values within each split are bold.}
 \label{tab:k_sensitivity}
-\scriptsize
-\setlength{\tabcolsep}{2.1pt}
-\renewcommand{\arraystretch}{1.06}
-\begin{tabular}{@{}c rrrr rrrr@{}}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular}{@{}c r r r r@{}}
 \toprule
-& \multicolumn{4}{c}{IND} & \multicolumn{4}{c}{OOD}\\
-\cmidrule(lr){2-5}\cmidrule(l){6-9}
-$k$ & SOR & SSOR & Sim & RI & SOR & SSOR & Sim & RI\\
+\multicolumn{5}{c}{\textit{In-domain (IND)}}\\
 \midrule
-1  & 39.1 & 17.0 & 0.58 & 71.2 & 27.3 & 10.9 & 0.58 & 12.4\\
-5  & \textbf{48.9} & \textbf{25.1} & \textbf{0.59} & 96.1 & 39.5 & \textbf{20.8} & \textbf{0.60} & \textbf{19.5}\\
-25 & 44.2 & 20.9 & 0.57 & \textbf{106.3} & \textbf{40.6} & 17.6 & 0.58 & 19.1\\
-50 & 30.2 & 10.5 & 0.56 & 80.6 & 25.2 & 6.4 & 0.57 & 11.7\\
+$k$ & SOR & SSOR & Sim & RI\\
+\midrule
+1  & 39.1 & 17.0 & 0.58 & 71.2\\
+5  & \textbf{48.9} & \textbf{25.1} & \textbf{0.59} & 96.1\\
+25 & 44.2 & 20.9 & 0.57 & \textbf{106.3}\\
+50 & 30.2 & 10.5 & 0.56 & 80.6\\
+\midrule
+\multicolumn{5}{c}{\textit{Out-of-domain (OOD)}}\\
+\midrule
+$k$ & SOR & SSOR & Sim & RI\\
+\midrule
+1  & 27.3 & 10.9 & 0.58 & 12.4\\
+5  & 39.5 & \textbf{20.8} & \textbf{0.60} & \textbf{19.5}\\
+25 & \textbf{40.6} & 17.6 & 0.58 & 19.1\\
+50 & 25.2 & 6.4 & 0.57 & 11.7\\
 \bottomrule
 \end{tabular}
+\endgroup
 \end{table}
 
 For GDPO, the temperature $\tau$ controls how strongly smooth-min aggregation prioritizes low normalized property-wise advantages. Table~\ref{tab:tau_sensitivity} shows that $\tau=1$ offers strong IND and OOD performance in the reported sweep, though $\tau=0.5$ slightly improves IND SSOR and similarity.
