@@ -49,7 +49,9 @@ In \textbf{BCMQ \#19 (Mistral)}, GRPO satisfies all criteria,
 whereas GDPO increases predicted CARC from 0.1345 to 0.4112
 and MUTAG from 0.1462 to 0.2612; these exceed the
 allowed preservation degradations of 0.2 and 0.1,
-respectively. GRPO predicts CARC=0.0186 and MUTAG=0.0768,
+respectively. The GeLLM$^4$O-C baseline also violates
+CARC preservation (0.5348) and fails the QED improvement margin.
+GRPO predicts CARC=0.0186 and MUTAG=0.0768,
 preserving both constraints. Conversely, in
 \textbf{ACEP \#127}, the source CARC=0.3452 requires
 a decrease of at least 0.2, to at most 0.1452.
@@ -65,6 +67,7 @@ informative because the base, GRPO, and GDPO candidates
 all satisfy SOR (but not SSOR), yet the two RL variants
 generate different molecules
 (Table~\ref{tab:case_smiles_diagnostic}).
+The baseline predicts AMP=0.9099 and BBBP=0.5551.
 GDPO produces larger predicted gains in AMP
 (0.8026 to 0.9413 versus 0.9117 under GRPO)
 and BBBP (0.4084 to 0.6891 versus 0.5737).
@@ -97,6 +100,8 @@ with predicted AMP=0.9988, BBBP=0.9540,
 MUTAG=0.0005, and PlogP=4.0041, but produces
 a substituted benzene with Tanimoto similarity of
 only 0.0476 to the multi-ring, heteroatom-rich source.
+The SFT and GRPO variants still miss the required
+MUTAG improvement (predicted values 0.6472 and 0.3814).
 Here, the scoring criteria succeed while scaffold
 preservation is poor, exposing a limitation of
 property-only threshold evaluation, not experimentally
