@@ -649,21 +649,13 @@ GeLLM$^4$O-C$_{\mathrm{Mistral}}$ & 33.8 & 14.4 & 0.58 & 51.4 & 99.1 & 2.50 & 98
 \captionsetup[subfigure]{skip=1pt}
 \begin{subfigure}[t]{0.29\textwidth}
   \vspace{0pt}\centering
-  % PDF supplied separately; existing vector source remains the fallback.
-  \IfFileExists{figs/cmoral_figure3a_final.pdf}{%
-    \includegraphics[width=\linewidth]{figs/cmoral_figure3a_final.pdf}%
-  }{%
-    \includegraphics[width=\linewidth]{figs/cmoral_backbone_sor_panel.pdf}%
-  }
+  % Use independently tracked PDF artwork directly.
+  \includegraphics[width=\linewidth]{figs/cmoral_sor_grayblue_arrows.pdf}%
   \caption{}\label{fig:c-mumo_sor_panel}
 \end{subfigure}\hfill
 \begin{subfigure}[t]{0.69\textwidth}
   \vspace{0pt}\centering
-  \IfFileExists{figs/cmoral_figure3b_final.pdf}{%
-    \includegraphics[width=\linewidth]{figs/cmoral_figure3b_final.pdf}%
-  }{%
-    \resizebox{\linewidth}{!}{\input{figs/cmoral_grpo_gdpo_three_backbones.tex}}%
-  }
+  \includegraphics[width=\linewidth]{figs/cmoral_grpo_gdpo_tracks_crowns.pdf}%
   \caption{}\label{fig:c-mumo_grpo_gdpo_panel}
 \end{subfigure}
 \vspace{-1mm}
