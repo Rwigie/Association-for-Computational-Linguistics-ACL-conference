@@ -24,6 +24,27 @@ contrasting mechanisms, not to estimate their prevalence.
 % Each figure is adjacent to the corresponding property-level interpretation.
 % Missing molecule depictions are never replaced with fabricated structures.
 
+\subsection{Different edits despite equal SOR on ABMP}
+\label{sec:case_abmp208}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.94\textwidth]{figs/cmoral_case_abmp208.pdf}
+\caption{An ABMP source molecule and the SFT, GRPO, and GDPO outputs produced by Mistral-7B under single-candidate decoding. Labels report predicted AMP and BBBP scores and changes relative to the same source, with MUTAG and Morgan similarity where available. All three candidates satisfy SOR but not SSOR, yet exhibit different molecular edits and property improvements.}
+\label{fig:case_abmp208}
+\end{figure*}
+Figure~\ref{fig:case_abmp208} directly compares the verified molecular structures
+and property values, showing different editing strategies even when the success
+indicator is the same. The baseline,
+GRPO and GDPO all satisfy SOR but fail SSOR.
+Relative to the source AMP=0.8026 and BBBP=0.4084,
+GDPO reaches AMP=0.9413 and BBBP=0.6891, compared with
+AMP=0.9117 and BBBP=0.5737 under GRPO. In contrast,
+GRPO attains the lower predicted MUTAG (0.0821 versus 0.1343)
+and better structural similarity (Morgan Tanimoto 0.7246 versus 0.5600).
+The baseline predicts AMP=0.9099 and BBBP=0.5551.
+Thus equal joint success can mask meaningful differences in
+property improvement and scaffold preservation.
+
 \subsection{Joint constraint satisfaction on BCMQ}
 \label{sec:case_bcmq}
 \IfFileExists{figs/cmoral_case_bcmq19.pdf}{%
@@ -61,28 +82,6 @@ fall short of the prescribed threshold. GDPO achieves 0.0615
 and meets this constraint. This example illustrates that a candidate
 can make a substantial improvement and still fail the specified
 source-dependent objective.
-
-\subsection{Different edits despite equal SOR on ABMP}
-\label{sec:case_abmp208}
-\IfFileExists{figs/cmoral_case_abmp208.pdf}{%
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.94\textwidth]{figs/cmoral_case_abmp208.pdf}
-\caption{ABMP molecular optimization. The source and three actual generated molecules are shown in the same structural-comparison format as the BPQ case study. All three candidates satisfy SOR but not SSOR; the property and similarity values are discussed in the text.}
-\label{fig:case_abmp208}
-\end{figure*}
-}{}
-The source and generated molecular structures reveal different editing
-strategies even when the success indicator is the same. The baseline,
-GRPO and GDPO all satisfy SOR but fail SSOR.
-Relative to the source AMP=0.8026 and BBBP=0.4084,
-GDPO reaches AMP=0.9413 and BBBP=0.6891, compared with
-AMP=0.9117 and BBBP=0.5737 under GRPO. In contrast,
-GRPO attains the lower predicted MUTAG (0.0821 versus 0.1343)
-and better structural similarity (Morgan Tanimoto 0.7246 versus 0.5600).
-The baseline predicts AMP=0.9099 and BBBP=0.5551.
-Thus equal joint success can mask meaningful differences in
-property improvement and scaffold preservation.
 
 \subsection{Preservation versus improvement on ABMP}
 \label{sec:case_abmp18}
