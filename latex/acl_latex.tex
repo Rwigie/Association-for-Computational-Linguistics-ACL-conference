@@ -770,26 +770,32 @@ MAMO-direct and MAMO-adapted achieve IND SOR of $5.2\%$/$12.4\%$ and OOD SOR of 
 \textsc{C-Moral} also improves the smaller molecule-text model \textsc{MolT5}. Compared with \textsc{MolT5}-Large (SFT), RL post-training increases IND SOR/SSOR from $13.9\%/4.6\%$ to $20.0\%/8.8\%$, and OOD SOR/SSOR from $10.6\%/3.6\%$ to $19.2\%/7.7\%$, while maintaining similarity around $0.60$--$0.61$. Together with the stronger absolute performance of 7B/8B LLMs in Table~\ref{tab:c-mumo_overall}, these results show that \textsc{C-Moral} generalizes across model scales while model capacity remains important for complex controllable molecular editing.
 
 \paragraph{GRPO vs. GDPO.}
-GRPO geometrically aggregates sigmoid-aligned property scores before
-group-relative normalization; a low absolute property score thus
-suppresses the joint reward. GDPO instead normalizes each property
-across the candidate group before smooth-min aggregation,
-emphasizing the relatively weak dimensions (Appendix~\ref{appendix:gm_vs_logmin}).
-In aggregate, GRPO achieves higher OOD SOR/SSOR on both
-\textsc{Mistral} ($39.5\%/20.8\%$ vs.\ $38.3\%/19.8\%$)
-and \textsc{Llama} ($37.2\%/19.6\%$ vs.\ $35.6\%/19.5\%$),
-while GDPO yields higher RI in all four LLM backbone/split
-comparisons. However, GDPO leads on \textsc{Llama} IND SOR/SSOR
-($43.4\%/25.4\%$ vs.\ $40.2\%/20.0\%$).
-As illustrated by the qualitative case studies
-(Appendix~\ref{appendix:case_diagnostics}), GRPO and GDPO
-may fail on different property constraints and generate
-distinct molecules even when both succeed. These cases
-highlight property-wise bottlenecks and structural differences
-that aggregate success metrics can obscure, without implying
-a universal advantage for either method. Since normalization
-and aggregation change together, their separate contributions
-to the observed trade-off remain unresolved.
+The variants emphasize different aspects of multi-objective
+optimization. GRPO aggregates sigmoid-aligned \emph{absolute}
+property scores with a geometric mean before group-relative
+normalization, so one low-scoring criterion reduces the joint
+reward and encourages simultaneous improvement and preservation.
+GDPO instead normalizes \emph{each} property across candidates
+before smooth-min aggregation, emphasizing weaker relative
+property advantages within the group
+(Appendix~\ref{appendix:gm_vs_logmin}).
+Consistent with this distinction, GRPO achieves higher OOD
+SOR/SSOR on Mistral ($39.5\%/20.8\%$ vs.\
+$38.3\%/19.8\%$) and Llama ($37.2\%/19.6\%$ vs.\
+$35.6\%/19.5\%$), whereas GDPO yields higher RI
+in all four LLM backbone/split comparisons.
+The trade-off is not universal: GDPO leads Llama IND
+SOR/SSOR ($43.4\%/25.4\%$ vs.\ $40.2\%/20.0\%$).
+Qualitative case studies
+(Appendix~\ref{appendix:case_diagnostics}) clarify the
+difference: even when both variants satisfy the same criteria,
+GDPO can achieve larger target-property gains with more
+structural change, while GRPO can retain stronger preservation.
+Failure cases also show the converse risks: GRPO may miss a
+required improvement margin, while GDPO may improve one
+property at the expense of another preservation constraint.
+These are illustrative observations rather than causal proof;
+normalization and aggregation are changed jointly.
 
 \subsection{Results on S$^2$-Bench MolOpt}
 
