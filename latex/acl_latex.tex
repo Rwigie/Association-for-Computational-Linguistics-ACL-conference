@@ -781,17 +781,15 @@ and \textsc{Llama} ($37.2\%/19.6\%$ vs.\ $35.6\%/19.5\%$),
 while GDPO yields higher RI in all four LLM backbone/split
 comparisons. However, GDPO leads on \textsc{Llama} IND SOR/SSOR
 ($43.4\%/25.4\%$ vs.\ $40.2\%/20.0\%$).
-The qualitative case studies in Appendix~\ref{appendix:case_diagnostics}
-further illustrate that the two variants can fail due to different
-property-specific bottlenecks, such as insufficient improvement of a
-target property or violation of a preservation constraint. Moreover,
-even when both methods satisfy all specified criteria, they may
-generate structurally distinct molecules; property success does not
-necessarily imply strong scaffold preservation. These selected
-examples provide molecule-level context for the aggregate
-SOR--RI trade-off but are not representative of overall performance.
-Because normalization and aggregation change simultaneously,
-they do not isolate the cause of the observed differences.
+As illustrated by the qualitative case studies
+(Appendix~\ref{appendix:case_diagnostics}), GRPO and GDPO
+may fail on different property constraints and generate
+distinct molecules even when both succeed. These cases
+highlight property-wise bottlenecks and structural differences
+that aggregate success metrics can obscure, without implying
+a universal advantage for either method. Since normalization
+and aggregation change together, their separate contributions
+to the observed trade-off remain unresolved.
 
 \subsection{Results on S$^2$-Bench MolOpt}
 
