@@ -17,154 +17,115 @@ radius-2, 2048-bit Tanimoto; no hard similarity constraint
 is enforced in this evaluation. Cases are selected to expose
 contrasting mechanisms, not to estimate their prevalence.
 
-\begin{table*}[t]
-\centering\footnotesize
-\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.12}
-\begin{tabularx}{\textwidth}{@{}llcccX@{}}
-\toprule
-\textbf{Case} & \textbf{Backbone} & \textbf{Base} &
-\textbf{GRPO} & \textbf{GDPO} & \textbf{Key observation}\\
-\midrule
-BCMQ \#19 & Mistral & 0/0 & \textbf{1/1} & 0/0 &
-GDPO violates CARC/MUTAG preservation; GRPO satisfies all criteria.\\
-ACEP \#127 & Mistral & 0/0 & 0/0 & \textbf{1/1} &
-GDPO clears the CARC improvement margin missed by GRPO.\\
-ABMP \#208 & Mistral & 1/0 & 1/0 & 1/0 &
-Both pass SOR with distinct molecules; GDPO gains more AMP/BBBP,
-GRPO has lower MUTAG and higher similarity.\\
-ABMP \#18 & Mistral & 0/0 & 0/0 & 0/0 &
-GRPO misses the MUTAG improvement threshold; GDPO degrades BBBP.\\
-ABMP \#417 & MolT5 & 0/0 & 0/0 & \textbf{1/1} &
-GDPO passes property criteria but severely changes the scaffold.\\
-\bottomrule
-\end{tabularx}
-\caption{Five selected cases under single-candidate decoding.
-Entries indicate SOR/SSOR (1 = success); Base is GeLLM$^4$O-C
-for Mistral and SFT for MolT5.}
-\label{tab:case_diagnostic_overview}
-\end{table*}
 
-\paragraph{Constraint satisfaction versus stronger targeted gains.}
-In \textbf{BCMQ \#19 (Mistral)}, GRPO satisfies all criteria,
-whereas GDPO increases predicted CARC from 0.1345 to 0.4112
-and MUTAG from 0.1462 to 0.2612; these exceed the
-allowed preservation degradations of 0.2 and 0.1,
-respectively. The GeLLM$^4$O-C baseline also violates
-CARC preservation (0.5348) and fails the QED improvement margin.
-GRPO predicts CARC=0.0186 and MUTAG=0.0768,
-preserving both constraints. Conversely, in
-\textbf{ACEP \#127}, the source CARC=0.3452 requires
-a decrease of at least 0.2, to at most 0.1452.
-The baseline (0.2071) and GRPO (0.1636) fall short,
-but GDPO attains 0.0615 and succeeds. Thus,
-joint satisfaction can depend on preserving a weak
-dimension or making enough progress on a still-failing
-target; neither variant uniformly resolves both.
 
-\paragraph{Both succeed, with different optimization emphases.}
-The \textbf{ABMP \#208 (Mistral)} input is especially
-informative because the base, GRPO, and GDPO candidates
-all satisfy SOR (but not SSOR), yet the two RL variants
-generate different molecules
-(see the corresponding molecular structure comparison).
-The baseline predicts AMP=0.9099 and BBBP=0.5551.
-GDPO produces larger predicted gains in AMP
-(0.8026 to 0.9413 versus 0.9117 under GRPO)
-and BBBP (0.4084 to 0.6891 versus 0.5737).
-GRPO, however, achieves a lower predicted MUTAG
-(0.0821 versus 0.1343) and retains more of the
-source structure (Tanimoto 0.7246 versus 0.5600).
-All four source-conditioned criteria pass for both
-models. This observation is consistent with the
-aggregate distinction between stronger joint-criterion
-satisfaction under GRPO and larger relative property
-improvements under GDPO, but a single example does not
-establish a general algorithmic preference.
 
-\paragraph{Why do the models fail?}
-In \textbf{ABMP \#18 (Mistral)}, both candidate SMILES
-are valid yet both fail SOR for different reasons.
-GRPO lowers MUTAG from 0.3387 to 0.2728, an improvement
-of only 0.0659 versus the required 0.1 decrease.
-GDPO lowers MUTAG much further to 0.0504, but
-also reduces BBBP from 0.9099 to 0.6743,
-exceeding the maximum allowed 0.1 degradation.
-This illustrates a trade-off between aggressive
-target-property optimization and protecting a
-preservation constraint. It is not evidence of a
-universal tendency on every input.
+% Case-by-case molecule comparisons use the established BPQ visual format.
+% Each figure is adjacent to the corresponding property-level interpretation.
+% Missing molecule depictions are never replaced with fabricated structures.
 
-\paragraph{Structural drift despite successful scoring.}
-In \textbf{ABMP \#417 (MolT5)}, GDPO reaches SOR=SSOR=1,
-with predicted AMP=0.9988, BBBP=0.9540,
-MUTAG=0.0005, and PlogP=4.0041, but produces
-a substituted benzene with Tanimoto similarity of
-only 0.0476 to the multi-ring, heteroatom-rich source.
-The SFT and GRPO variants still miss the required
-MUTAG improvement (predicted values 0.6472 and 0.3814).
-Here, the scoring criteria succeed while scaffold
-preservation is poor, exposing a limitation of
-property-only threshold evaluation, not experimentally
-validated drug quality.
-
-\paragraph{Molecular structure comparisons.}
-The companion molecular figures (when the supplied PDF assets
-are present) visualize
-the corresponding \emph{RDKit-depicted} source and generated
-molecules. The green/red per-property numbers indicate whether
-each source-conditional constraint passes/fails; the displayed
-success outcomes refer to the greedy single-candidate audit,
-not the 20-beam aggregate evaluation. These molecular
-illustrations complement the property-level discussion above.
-
+\subsection{Joint constraint satisfaction on BCMQ}
+\label{sec:case_bcmq}
 \IfFileExists{figs/cmoral_case_bcmq19.pdf}{%
-\begin{figure*}[!tp]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{figs/cmoral_case_bcmq19.pdf}
-\caption{Example of successful joint constraint satisfaction on BCMQ (Mistral). The base model and GDPO violate property criteria, whereas GRPO satisfies the preservation and improvement requirements.}
+\includegraphics[width=0.94\textwidth]{figs/cmoral_case_bcmq19.pdf}
+\caption{BCMQ molecular editing by the SFT baseline, \textsc{C-Moral}-GRPO and \textsc{C-Moral}-GDPO. Property values are source-conditional model predictions; successful and violated constraints should be highlighted per candidate.}
 \label{fig:case_bcmq19}
 \end{figure*}
 }{}
+For this representative BCMQ input, GRPO satisfies all required criteria. The
+SFT baseline and GDPO do not. In particular, GDPO raises predicted CARC
+from 0.1345 to 0.4112 and MUTAG from 0.1462 to 0.2612, exceeding
+their permitted preservation margins of 0.2 and 0.1, respectively.
+The SFT baseline likewise violates CARC preservation (0.5348)
+and misses the QED improvement target. GRPO achieves CARC=0.0186
+and MUTAG=0.0768, preserving both constraints. The successful
+candidate therefore improves joint satisfaction not merely by
+maximizing a favorable property but by avoiding two constraint violations.
 
+\subsection{A carcinogenicity-improvement bottleneck on ACEP}
+\label{sec:case_acep}
 \IfFileExists{figs/cmoral_case_acep127.pdf}{%
-\begin{figure*}[!tp]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{figs/cmoral_case_acep127.pdf}
-\caption{Example of a decisive optimization bottleneck on ACEP (Mistral). GDPO meets the required carcinogenicity reduction, whereas the other two valid outputs fall short.}
+\includegraphics[width=0.94\textwidth]{figs/cmoral_case_acep127.pdf}
+\caption{ACEP optimization: source and generated molecular structures, predicted properties and threshold satisfaction for SFT, GRPO and GDPO.}
 \label{fig:case_acep127}
 \end{figure*}
 }{}
+The source molecule has predicted CARC=0.3452. The requested improvement
+requires a reduction of at least 0.2, hence CARC must be at most 0.1452.
+The baseline (0.2071) and GRPO (0.1636) both improve CARC but
+fall short of the prescribed threshold. GDPO achieves 0.0615
+and meets this constraint. This example illustrates that a candidate
+can make a substantial improvement and still fail the specified
+source-dependent objective.
 
+\subsection{Different edits despite equal SOR on ABMP}
+\label{sec:case_abmp208}
 \IfFileExists{figs/cmoral_case_abmp208.pdf}{%
-\begin{figure*}[!tp]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{figs/cmoral_case_abmp208.pdf}
-\caption{Two distinct SOR-successful optimization outcomes on ABMP (Mistral). GDPO produces larger AMP/BBBP gains, while GRPO achieves lower MUTAG and higher input similarity.}
+\includegraphics[width=0.94\textwidth]{figs/cmoral_case_abmp208.pdf}
+\caption{ABMP molecular optimization. The source and three actual generated molecules are shown in the same structural-comparison format as the BPQ case study. All three candidates satisfy SOR but not SSOR; the property and similarity values are discussed in the text.}
 \label{fig:case_abmp208}
 \end{figure*}
 }{}
+The source and generated molecular structures reveal different editing
+strategies even when the success indicator is the same. The baseline,
+GRPO and GDPO all satisfy SOR but fail SSOR.
+Relative to the source AMP=0.8026 and BBBP=0.4084,
+GDPO reaches AMP=0.9413 and BBBP=0.6891, compared with
+AMP=0.9117 and BBBP=0.5737 under GRPO. In contrast,
+GRPO attains the lower predicted MUTAG (0.0821 versus 0.1343)
+and better structural similarity (Morgan Tanimoto 0.7246 versus 0.5600).
+The baseline predicts AMP=0.9099 and BBBP=0.5551.
+Thus equal joint success can mask meaningful differences in
+property improvement and scaffold preservation.
 
+\subsection{Preservation versus improvement on ABMP}
+\label{sec:case_abmp18}
 \IfFileExists{figs/cmoral_case_abmp18.pdf}{%
-\begin{figure*}[!tp]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{figs/cmoral_case_abmp18.pdf}
-\caption{Two different failure mechanisms on ABMP (Mistral). GRPO fails the required MUTAG reduction; GDPO achieves MUTAG improvement but violates the BBBP preservation constraint.}
+\includegraphics[width=0.94\textwidth]{figs/cmoral_case_abmp18.pdf}
+\caption{ABMP failure analysis. GRPO misses the MUTAG improvement margin, whereas GDPO violates a BBBP preservation requirement.}
 \label{fig:case_abmp18}
 \end{figure*}
 }{}
+Both models generate valid SMILES but fail SOR for different
+reasons. GRPO reduces predicted MUTAG from 0.3387 to 0.2728,
+a reduction of only 0.0659 against the required 0.1.
+GDPO reduces MUTAG further to 0.0504; however, it also
+decreases BBBP from 0.9099 to 0.6743,
+exceeding the permitted preservation degradation of 0.1.
+The contrast makes clear why improving one objective does not
+guarantee success when another must be preserved.
 
+\subsection{Scaffold drift despite property success on ABMP}
+\label{sec:case_abmp417}
 \IfFileExists{figs/cmoral_case_abmp417.pdf}{%
-\begin{figure*}[!tp]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{figs/cmoral_case_abmp417.pdf}
-\caption{A MolT5 structural-drift limitation: GDPO meets all computed property constraints, but the molecule differs strongly from the source (Tanimoto 0.0476).}
+\includegraphics[width=0.94\textwidth]{figs/cmoral_case_abmp417.pdf}
+\caption{MolT5 optimization with large structural drift. Although GDPO meets all measured thresholds, the generated compound is markedly dissimilar to the input.}
 \label{fig:case_abmp417}
 \end{figure*}
 }{}
-
+The MolT5-GDPO output satisfies both SOR and SSOR,
+with predicted AMP=0.9988, BBBP=0.9540,
+MUTAG=0.0005 and PlogP=4.0041. However, the output is a
+substituted benzene and its Morgan Tanimoto similarity to the
+heteroatom-rich, multi-ring source is only 0.0476.
+The MolT5-SFT and GRPO candidates still miss MUTAG
+improvement (predicted values 0.6472 and 0.3814).
+This case separates success under calculated property thresholds
+from the separate medicinal-chemistry requirement of
+preserving a useful starting scaffold.
 
 \paragraph{Takeaway.}
-The cases identify concrete failure mechanisms---insufficient
+Taken together, these molecule-level comparisons identify concrete failure mechanisms---insufficient
 improvement on a required property, violation of a preserved
 property, and substantial structure changes despite scored success.
 They also show that equal SOR can hide different molecular edits
