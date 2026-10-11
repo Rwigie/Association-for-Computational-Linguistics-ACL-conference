@@ -51,9 +51,9 @@ def panel(c,case,out,ox,oy):
     c.setStrokeColor(RULE)
     c.setLineWidth(.8)
     c.roundRect(ox+.5,oy+.5,W-1,PANEL-1,7,stroke=1,fill=0)
-    txt(c,ox+12,oy+PANEL-19,"SOURCE MOLECULE",9,True,GREY)
-    txt(c,ox+W/2,oy+PANEL-19,f"SOR {out['SOR']} / SSOR {out['SSOR']}",9,True,GREEN,"center")
-    txt(c,ox+W-12,oy+PANEL-19,out["name"],10,True,BLUE,"right")
+    txt(c,ox+12,oy+PANEL-19,"SOURCE MOLECULE",12,True,GREY)
+    txt(c,ox+W/2,oy+PANEL-19,f"SOR {out['SOR']} / SSOR {out['SSOR']}",12,True,GREEN,"center")
+    txt(c,ox+W-12,oy+PANEL-19,out["name"],13,True,BLUE,"right")
     molecule(c,case["source"]["smiles"],ox+12,oy+37,315,129)
     molecule(c,out["smiles"],ox+W-327,oy+37,315,129)
     cx=ox+W/2;cy=oy+102
@@ -62,12 +62,13 @@ def panel(c,case,out,ox,oy):
     p.lineTo(cx+12,cy-13);p.lineTo(cx+28,cy);p.lineTo(cx+12,cy+13)
     p.lineTo(cx+12,cy+5);p.lineTo(cx-24,cy+5);p.close()
     c.drawPath(p,stroke=1,fill=0)
+    txt(c,cx,cy+20,"AMP +  BBBP +",11,True,GREEN,"center")
     src=case["source"]["metrics"];m=out["metrics"]
-    txt(c,ox+12,oy+23,"Source: "+"   ".join(f"{k} {v:.4f}" for k,v in src.items()),9,color=GREY)
+    txt(c,ox+12,oy+23,"Source: "+"   ".join(f"{k} {v:.4f}" for k,v in src.items()),12,color=GREY)
     diffs=[f"{k} {m[k]:.4f} ({m[k]-src[k]:+.4f})" for k in ["AMP","BBBP"] if k in src and k in m]
-    txt(c,ox+12,oy+9,"Generated: "+"   ".join(diffs),10,True,GREEN)
+    txt(c,ox+12,oy+9,"Generated: "+"   ".join(diffs),12,True,GREEN)
     rest="   ".join(f"{k} {m[k]:.4f}" for k in ["MUTAG","Sim"] if k in m)
-    if rest: txt(c,ox+W-12,oy+9,rest,9,color=GREY,align="right")
+    if rest: txt(c,ox+W-12,oy+9,rest,11,color=GREY,align="right")
 
 def render(case,out_dir):
     if not case.get("source",{}).get("smiles"): raise ValueError("Missing source SMILES")
@@ -78,8 +79,8 @@ def render(case,out_dir):
     output=out_dir/("cmoral_case_"+case["id"]+".pdf")
     c=canvas.Canvas(str(output),pagesize=(W,height),pageCompression=1)
     c.setTitle(case["title"]+" - source and model generated molecular structures")
-    txt(c,12,height-17,case["title"],13,True)
-    txt(c,W-12,height-17,case["backbone"]+" | greedy candidate",9,color=GREY,align="right")
+    txt(c,12,height-17,case["title"],16,True)
+    txt(c,W-12,height-17,case["backbone"]+" | greedy candidate",11,color=GREY,align="right")
     for j,out in enumerate(outputs):
         panel(c,case,out,0,height-42-(j+1)*PANEL-j*GAP)
     c.showPage();c.save()
